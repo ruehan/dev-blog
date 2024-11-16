@@ -58,12 +58,12 @@ const RootLayout = ({ children }: { children: React.ReactNode }) => {
                             >
                                 Blog
                             </Link>
-                            <Link
-                                href="/about"
-                                className="block px-3 py-2 text-gray-700 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white"
-                            >
-                                About
-                            </Link>
+                            {/*<Link*/}
+                            {/*    href="/about"*/}
+                            {/*    className="block px-3 py-2 text-gray-700 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white"*/}
+                            {/*>*/}
+                            {/*    About*/}
+                            {/*</Link>*/}
                         </div>
                     </div>
                 )}
