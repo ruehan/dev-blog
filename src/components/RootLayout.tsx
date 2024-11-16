@@ -1,3 +1,5 @@
+'use client';
+
 import React from 'react';
 import Link from 'next/link';
 import { useTheme } from 'next-themes';
@@ -6,6 +8,11 @@ import { Sun, Moon, Menu } from 'lucide-react';
 const RootLayout = ({ children }: { children: React.ReactNode }) => {
     const [isMenuOpen, setIsMenuOpen] = React.useState(false);
     const { theme, setTheme } = useTheme();
+
+    const navLinks = [
+        { href: '/', label: 'Blog' },
+        { href: '/about', label: 'About' }
+    ];
 
     return (
         <div className="min-h-screen bg-white dark:bg-gray-900">
@@ -22,12 +29,15 @@ const RootLayout = ({ children }: { children: React.ReactNode }) => {
 
                         {/* Desktop Navigation */}
                         <div className="hidden sm:flex sm:items-center sm:space-x-8">
-                            <Link href="/blog" className="text-gray-700 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white">
-                                Blog
-                            </Link>
-                            {/*<Link href="/about" className="text-gray-700 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white">*/}
-                            {/*    About*/}
-                            {/*</Link>*/}
+                            {navLinks.map((link) => (
+                                <Link
+                                    key={link.href}
+                                    href={link.href}
+                                    className="text-gray-700 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white"
+                                >
+                                    {link.label}
+                                </Link>
+                            ))}
                             <button
                                 onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
                                 className="p-2 text-gray-700 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white"
@@ -52,18 +62,16 @@ const RootLayout = ({ children }: { children: React.ReactNode }) => {
                 {isMenuOpen && (
                     <div className="sm:hidden">
                         <div className="pt-2 pb-3 space-y-1">
-                            <Link
-                                href="/blog"
-                                className="block px-3 py-2 text-gray-700 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white"
-                            >
-                                Blog
-                            </Link>
-                            {/*<Link*/}
-                            {/*    href="/about"*/}
-                            {/*    className="block px-3 py-2 text-gray-700 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white"*/}
-                            {/*>*/}
-                            {/*    About*/}
-                            {/*</Link>*/}
+                            {navLinks.map((link) => (
+                                <Link
+                                    key={link.href}
+                                    href={link.href}
+                                    className="block px-3 py-2 text-gray-700 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white"
+                                    onClick={() => setIsMenuOpen(false)}
+                                >
+                                    {link.label}
+                                </Link>
+                            ))}
                         </div>
                     </div>
                 )}
