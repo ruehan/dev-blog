@@ -2,43 +2,33 @@ import { getPostBySlug, getAllPosts } from '@/utils/mdx';
 import BlogPostClient from '@/components/BlogPostClient';
 import { Metadata } from 'next';
 
-export async function generateStaticParams() {
+interface PageProps {
+    params: {
+        slug: string;
+    };
+}
+
+// Generate static parameters for dynamic routes
+export async function generateStaticParams(): Promise<Array<{ slug: string }>> {
     const posts = await getAllPosts();
-    return posts.map((post) => ({
+    return posts.map(post => ({
         slug: post.slug,
     }));
 }
 
+// Generate metadata dynamically for each page
 export async function generateMetadata({
                                            params,
-                                       }: {
-    params: { slug: string };
-}): Promise<Metadata> {
+                                       }: PageProps): Promise<Metadata> {
     const post = await getPostBySlug(params.slug);
-
     return {
         title: `${post.title} | Dev Blog`,
         description: post.excerpt,
-        openGraph: {
-            title: post.title,
-            description: post.excerpt,
-            type: 'article',
-            authors: ['Your Name'],
-            tags: post.tags,
-        },
-        twitter: {
-            card: 'summary_large_image',
-            title: post.title,
-            description: post.excerpt,
-        },
     };
 }
 
-export default async function BlogPost({
-                                           params,
-                                       }: {
-    params: { slug: string };
-}) {
+// Main page component for rendering the blog post
+export default async function BlogPost({ params }: PageProps) {
     const post = await getPostBySlug(params.slug);
     const allPosts = await getAllPosts();
 

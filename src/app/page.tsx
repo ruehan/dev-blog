@@ -7,6 +7,8 @@ export const metadata: Metadata = {
     description: 'A blog about software development and technology',
 };
 
+export const revalidate = 60
+
 export default async function HomePage() {
     const posts = await getAllPosts();
     const categories = await getAllCategories();

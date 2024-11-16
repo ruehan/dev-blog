@@ -3,6 +3,7 @@ import { PostMeta } from '@/types/post';
 import Link from 'next/link';
 import { format } from 'date-fns';
 import { notFound } from 'next/navigation';
+import {Metadata} from "next";
 
 export async function generateStaticParams() {
     const tags = await getAllTags();
@@ -11,15 +12,15 @@ export async function generateStaticParams() {
     }));
 }
 
-export async function generateMetadata({
-                                           params,
-                                       }: {
+interface Props {
     params: { tag: string };
-}) {
-    const decodedTag = decodeURIComponent(params.tag);
+    searchParams: Record<string, string | string[] | undefined>;
+}
+
+export async function generateMetadata({ params }: Props): Promise<Metadata> {
     return {
-        title: `#${decodedTag} | Dev Blog`,
-        description: `Posts tagged with #${decodedTag}`,
+        title: `#${decodeURIComponent(params.tag)} | Dev Blog`,
+        description: `Posts tagged with #${decodeURIComponent(params.tag)}`,
     };
 }
 

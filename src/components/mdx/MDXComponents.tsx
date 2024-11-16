@@ -1,6 +1,7 @@
 import { type MDXComponents } from 'mdx/types';
 import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
 import { dracula } from 'react-syntax-highlighter/dist/cjs/styles/prism';
+import CopyButton from "@/components/CopyButton";
 
 const components: MDXComponents = {
     h1: ({ children }) => (
@@ -53,15 +54,19 @@ const components: MDXComponents = {
     ),
     code: ({ children, className }) => {
         const language = className ? className.replace('language-', '') : 'javascript';
+        const codeString = String(children).trim();
 
         return (
-            <SyntaxHighlighter
-                language={language}
-                style={dracula}
-                className="rounded-lg my-4"
-            >
-                {String(children).trim()}
-            </SyntaxHighlighter>
+            <div className="relative group">
+                <CopyButton text={codeString} />
+                <SyntaxHighlighter
+                    language={language}
+                    style={dracula}
+                    className="rounded-lg my-4"
+                >
+                    {codeString}
+                </SyntaxHighlighter>
+            </div>
         );
     },
     inlineCode: ({ children }) => (

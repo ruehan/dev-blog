@@ -9,23 +9,23 @@ interface SearchBarProps {
     onSearch: (results: PostMeta[]) => void;
 }
 
-export default function SearchBar({ posts, onSearch }: SearchBarProps) {
+export default function SearchBar(x: SearchBarProps) {
     const [searchTerm, setSearchTerm] = useState('');
 
     const handleSearch = (term: string) => {
         setSearchTerm(term);
 
         if (!term.trim()) {
-            onSearch(posts);
+            x.onSearch(x.posts);
             return;
         }
 
-        const searchResults = posts.filter((post) => {
+        const searchResults = x.posts.filter((post) => {
             const searchContent = `${post.title} ${post.excerpt} ${post.category} ${post.tags.join(' ')}`.toLowerCase();
             return searchContent.includes(term.toLowerCase());
         });
 
-        onSearch(searchResults);
+        x.onSearch(searchResults);
     };
 
     return (

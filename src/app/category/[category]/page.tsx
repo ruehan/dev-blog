@@ -3,6 +3,7 @@ import { PostMeta } from '@/types/post';
 import Link from 'next/link';
 import { format } from 'date-fns';
 import { notFound } from 'next/navigation';
+import { Metadata } from 'next';
 
 export async function generateStaticParams() {
     const categories = await getAllCategories();
@@ -11,15 +12,15 @@ export async function generateStaticParams() {
     }));
 }
 
-export async function generateMetadata({
-                                           params,
-                                       }: {
+interface Props {
     params: { category: string };
-}) {
-    const decodedCategory = decodeURIComponent(params.category);
+    searchParams: Record<string, string | string[] | undefined>;
+}
+
+export async function generateMetadata({ params }: Props): Promise<Metadata> {
     return {
-        title: `${decodedCategory} | Dev Blog`,
-        description: `Posts in category ${decodedCategory}`,
+        title: `${decodeURIComponent(params.category)} | Dev Blog`,
+        description: `Posts in category ${decodeURIComponent(params.category)}`,
     };
 }
 
