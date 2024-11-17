@@ -10,6 +10,7 @@ export const TAG_MAP: { [key: string]: string } = {
 	cloudflare: "Cloudflare",
 	dnssec: "DNSSEC",
 	secure: "보안",
+	googleanalytics: "Google Analytics",
 };
 
 export const getCategoryInKorean = (englishCategory: string): string => {
