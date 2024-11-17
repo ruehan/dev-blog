@@ -1,0 +1,95 @@
+---
+title: "Cloudflare의 웹 애플리케이션 방화벽(WAF): 웹사이트 보안 강화"
+date: "2024-11-17"
+excerpt: "Cloudflare의 웹 애플리케이션 방화벽(WAF)을 설정하여 웹사이트 보안을 강화하는 방법에 대해 다룹니다."
+tags: ["Cloudflare", "WAF", "보안"]
+category: "프론트엔드"
+---
+
+# Cloudflare의 웹 애플리케이션 방화벽(WAF): 웹사이트 보안 강화
+
+웹 애플리케이션 방화벽(Web Application Firewall, WAF)은 Cloudflare의 핵심 보안 도구 중 하나로, 다양한 공격으로부터 웹사이트를 보호합니다.
+이 포스트에서는 Cloudflare의 WAF를 설정하고 관리하는 방법을 단계별로 설명하겠습니다.
+
+## WAF란 무엇인가요? 🤔
+
+WAF는 웹 애플리케이션을 타겟으로 한 공격을 탐지하고 차단하는 보안 솔루션입니다. 다음과 같은 주요 기능을 제공합니다:
+
+- **SQL 삽입 방지**: SQL 인젝션 공격으로부터 데이터베이스를 보호합니다.
+- **XSS(교차 사이트 스크립팅) 방지**: 사용자 입력 데이터를 통해 악성 스크립트를 실행하는 공격을 방지합니다.
+- **Rate Limiting**: 특정 IP 주소나 사용자로부터의 과도한 요청을 제한하여 서비스 거부 공격(DDoS)을 방지합니다.
+- **IP 차단**: 악의적인 IP 주소를 차단하여 공격을 차단합니다.
+
+## Cloudflare에서 WAF 설정하기 ⚙️
+
+### 1. Cloudflare 계정 로그인
+
+[Cloudflare](https://dash.cloudflare.com/login) 계정에 로그인합니다.
+
+### 2. WAF 설정 페이지 이동
+
+대시보드에서 도메인을 선택 후 좌측 메뉴에서 보안(Security) -> **WAF(Web Application Firewall)** 로 이동합니다.
+
+![Dashboard](https://imagedelivery.net/CJyrB-EkqcsF2D6ApJzEBg/d06de2d0-4e21-417b-6408-331712192c00/public)
+
+### 3. 방화벽 규칙 생성
+
+- 사용자 지정 규칙을 클릭합니다.
+- 필드 항목에서 방화벽 규칙을 설정할 조건(국가, IP 주소, 요청 메소드 등)을 선택합니다.
+- 연산자를 선택하고, 해당 조건과 일치하는 값을 입력합니다.
+- 작업 타입을 차단 또는 허용으로 설정합니다.
+- 설명을 입력하고 방화벽 규칙 배포를 클릭합니다.
+
+![Firewall](https://imagedelivery.net/CJyrB-EkqcsF2D6ApJzEBg/7411d292-2b18-453d-bbbf-6ea0e9297900/public)
+
+예시:
+
+```text
+필드: 요청 메소드 (Request Method)
+연산자: 같음 (Equals)
+값: POST
+작업 타입: 차단 (Block)
+설명: POST 요청 차단
+```
+
+![example](https://imagedelivery.net/CJyrB-EkqcsF2D6ApJzEBg/fb82fc5e-e60d-4ef4-a46f-982697033b00/public)
+
+## 4. 관리 규칙 사용
+
+Cloudflare에서는 OWASP 규칙과 Cloudflare Managed Rules를 기본적으로 제공합니다.
+이 규칙은 SQL 삽입, XSS와 같은 일반적인 공격 벡터에 대해 이미 설정되어 있습니다.
+
+```text
+- **Cloudflare Managed Ruleset**: Cloudflare 보안팀에 의해 생성된 이 규칙 집합은 모든 애플리케이션에 대한 빠르고 효과적인 보호를 제공합니다. 규칙 집합은 새로운 취약점을 커버하고 긍정 오류를 줄이기 위해 자주 업데이트됩니다.
+
+- **Cloudflare OWASP Core Ruleset**: Cloudflare의 OWASP ModSecurity Core Rule Set 구현입니다. Cloudflare는 공식 코드 저장소에서 이용 가능한 최신 버전을 기반으로 OWASP에서 업데이트를 지속적으로 모니터링합니다.
+
+- **Cloudflare Exposed Credentials Check**: 사용자 인증 엔드포인트에 자동화된 자격 증명 검사를 배포합니다. Cloudflare WAF는 모든 자격 증명 쌍에 대해 공개 데이터베이스에서 도난당한 자격 증명을 조회합니다.
+
+- **Cloudflare Free Managed Ruleset**: 모든 Cloudflare 요금제에서 이용 가능합니다. 고위험 및 광범위한 영향을 미치는 취약점에 대한 완화 기능을 제공합니다. 이 규칙은 대부분의 애플리케이션에 안전하게 배포할 수 있습니다.
+
+- **Cloudflare Sensitive Data Detection**: Cloudflare가 일반적인 데이터 유출 위협을 해결하기 위해 만든 규칙입니다. 이 규칙들은 특정한 민감한 데이터(예: 금융 정보 및 개인 식별 정보)의 다운로드를 모니터링합니다.
+```
+
+## 5. 기계 학습(WAF ML) 설정
+
+Cloudflare는 기계 학습을 통해 WAF의 감지를 개선합니다. 이를 통해:
+
+- 모든 트래픽을 분석하고, 각 요청에 대해 SQLi 또는 XSS 공격의 가능성을 점수로 매깁니다.
+- 기계 학습 모델은 관리 규칙에 의해 범주화된 양호/불량 트래픽을 학습하여 새로운 공격 패턴을 식별합니다.
+- 사용자는 cf.waf.ml.score, cf.waf.ml.score.sqli, cf.waf.ml.score.xss와 같은 점수 기반으로 사용자 지정 방화벽 규칙을 설정할 수 있습니다.
+
+[출처: cloudflare blog](https://blog.cloudflare.com/ko-kr/waf-ml/)
+
+## WAF 설정 시 주의사항 ⚠️
+
+- **부정 오류(FP)와 긍정 오류(FN)**: 관리 규칙은 테스트를 통해 최적화되지만, 일부 공격 변형은 놓칠 수 있습니다. 기계 학습 모델은 이러한 문제를 해결하는 데 도움이 됩니다.
+- **성능**: 기계 학습 엔진은 성능을 개선하며, 새로운 공격 벡터에 대한 보호를 제공합니다.
+- **프록시 설정**: DNS 설정을 통해 Cloudflare의 프록시 기능을 활성화해야 WAF가 동작합니다.
+
+## 마무리하며 💭
+
+Cloudflare의 WAF는 웹 애플리케이션의 보안을 강화하는 중요한 도구입니다.
+관리 규칙과 기계 학습을 통해 다양한 공격으로부터 사이트를 보호할 수 있습니다.
+프론트엔드 개발자로서 WAF를 설정하고 관리하는 과정을 익힘으로써, 웹사이트의 보안을 한층 더 강화할 수 있습니다.
+Cloudflare의 WAF를 통해 사용자와 데이터를 안전하게 지키세요!

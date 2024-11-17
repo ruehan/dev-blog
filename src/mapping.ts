@@ -9,6 +9,7 @@ export const TAG_MAP: { [key: string]: string } = {
 	nextjs: "Next.js",
 	cloudflare: "Cloudflare",
 	dnssec: "DNSSEC",
+	secure: "보안",
 };
 
 export const getCategoryInKorean = (englishCategory: string): string => {
