@@ -32,7 +32,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 			tags: post.tags,
 			images: [
 				{
-					url: `https://ruehan.org/api/og?title=${encodeURIComponent(post.title)}`,
+					url: "https://imagedelivery.net/CJyrB-EkqcsF2D6ApJzEBg/6446a53f-3893-4008-ebb7-e565c6dc9200/public",
 					width: 1200,
 					height: 630,
 					alt: post.title,
@@ -43,7 +43,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 			card: "summary_large_image",
 			title: post.title,
 			description: post.excerpt,
-			images: [`https://ruehan.org/api/og?title=${encodeURIComponent(post.title)}`],
+			images: ["https://imagedelivery.net/CJyrB-EkqcsF2D6ApJzEBg/6446a53f-3893-4008-ebb7-e565c6dc9200/public"],
 		},
 	};
 }
