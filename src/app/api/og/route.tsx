@@ -1,11 +1,12 @@
 import { ImageResponse } from "next/og";
+import { NextRequest } from "next/server";
 
 export const runtime = "edge";
 
-export async function GET(request: Request) {
+export async function GET(req: NextRequest) {
 	try {
-		const { searchParams } = new URL(request.url);
-		const title = searchParams.get("title") || "Dev Blog";
+		const { searchParams } = new URL(req.url);
+		const title = searchParams.get("title") || "Ruehan Blog";
 
 		return new ImageResponse(
 			(
@@ -17,7 +18,7 @@ export async function GET(request: Request) {
 						flexDirection: "column",
 						alignItems: "center",
 						justifyContent: "center",
-						backgroundColor: "white",
+						background: "linear-gradient(to bottom, #fff, #f5f5f5)",
 						padding: "40px 80px",
 					}}
 				>
@@ -26,10 +27,19 @@ export async function GET(request: Request) {
 							fontSize: 60,
 							fontWeight: 700,
 							textAlign: "center",
-							color: "black",
+							color: "#1a1a1a",
+							marginBottom: 20,
 						}}
 					>
 						{title}
+					</div>
+					<div
+						style={{
+							fontSize: 30,
+							color: "#666",
+						}}
+					>
+						ruehan.org
 					</div>
 				</div>
 			),
@@ -39,8 +49,7 @@ export async function GET(request: Request) {
 			}
 		);
 	} catch (e) {
-		return new Response(`Failed to generate the image`, {
-			status: 500,
-		});
+		console.error(e);
+		return new Response("Failed to generate OG image", { status: 500 });
 	}
 }
