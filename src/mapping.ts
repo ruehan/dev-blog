@@ -1,11 +1,14 @@
 export const CATEGORY_MAP: { [key: string]: string } = {
 	develop: "개발",
+	fe_develop: "프론트엔드",
 };
 
 export const TAG_MAP: { [key: string]: string } = {
 	intro: "introduction",
 	blog: "블로그",
 	nextjs: "Next.js",
+	cloudflare: "Cloudflare",
+	dnssec: "DNSSEC",
 };
 
 export const getCategoryInKorean = (englishCategory: string): string => {
