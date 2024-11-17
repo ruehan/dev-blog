@@ -1,11 +1,11 @@
-import { Inter } from "next/font/google";
+// import { Inter } from "next/font/google";
 import "./globals.css";
 import { Providers } from "./providers";
 import RootLayout from "../components/RootLayout";
 import { Metadata } from "next";
 import GoogleAnalytics from "@/components/GoogleAnalytics";
 
-const inter = Inter({ subsets: ["latin"] });
+// const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
 	title: {
@@ -39,8 +39,11 @@ export const metadata: Metadata = {
 
 export default function Layout({ children }: { children: React.ReactNode }) {
 	return (
-		<html lang="en" suppressHydrationWarning>
-			<body className={inter.className}>
+		<html lang="ko" suppressHydrationWarning>
+			<head>
+				<link href="https://cdn.jsdelivr.net/gh/sunn-us/SUIT/fonts/variable/woff2/SUIT-Variable.css" rel="stylesheet" />
+			</head>
+			<body className="font-suit">
 				{process.env.NEXT_PUBLIC_GA_ID && <GoogleAnalytics GA_MEASUREMENT_ID={process.env.NEXT_PUBLIC_GA_ID} />}
 				<Providers attribute="class" defaultTheme="system" enableSystem>
 					<RootLayout>{children}</RootLayout>
