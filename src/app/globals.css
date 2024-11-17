@@ -2,6 +2,14 @@
 @tailwind components;
 @tailwind utilities;
 
+:root {
+	font-family: "SUIT Variable", sans-serif;
+}
+
+body {
+	@apply bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100;
+}
+
 @layer base {
 	:root {
 		--background: #ffffff;
