@@ -19,7 +19,7 @@ export const metadata: Metadata = {
 		description: "개발 관련 지식과 경험을 공유하는 블로그입니다.",
 		images: [
 			{
-				url: "https://ruehan.org/og-image.png", // 기본 OG 이미지
+				url: "/og-image.jpg",
 				width: 1200,
 				height: 630,
 				alt: "Ruehan Blog",
@@ -30,7 +30,7 @@ export const metadata: Metadata = {
 		card: "summary_large_image",
 		title: "Ruehan Blog",
 		description: "개발 관련 지식과 경험을 공유하는 블로그입니다.",
-		images: ["https://ruehan.org/og-image.png"],
+		images: ["/og-image.jpg"],
 		creator: "@ruehan",
 	},
 	icons: {
