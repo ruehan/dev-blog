@@ -1,24 +1,16 @@
-import { getAllPosts, getAllCategories, getAllTags } from '@/utils/mdx';
-import BlogPageClient from '@/components/BlogPageClient';
-import { Metadata } from 'next';
+import { Metadata } from "next";
+import BlogPageClient from "@/components/BlogPageClient";
+import { getAllPosts, getAllCategories, getAllTags } from "@/utils/mdx";
 
 export const metadata: Metadata = {
-    title: 'Dev Blog | Home',
-    description: 'A blog about software development and technology',
+	title: "Ruehan Blog",
+	description: "개발 관련 지식과 경험을 공유하는 블로그입니다.",
 };
 
-export const revalidate = 60
-
 export default async function HomePage() {
-    const posts = await getAllPosts();
-    const categories = await getAllCategories();
-    const tags = await getAllTags();
+	const posts = await getAllPosts();
+	const categories = await getAllCategories();
+	const tags = await getAllTags();
 
-    return (
-        <BlogPageClient
-            initialPosts={posts}
-            categories={categories}
-            tags={tags}
-        />
-    );
+	return <BlogPageClient initialPosts={posts} categories={categories} tags={tags} />;
 }
