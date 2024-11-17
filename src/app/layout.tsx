@@ -21,7 +21,7 @@ export const metadata: Metadata = {
 		description: "개발 관련 지식과 경험을 공유하는 블로그입니다.",
 		images: [
 			{
-				url: "/og-image.png", // 여기에 OG 이미지 경로를 지정
+				url: "/og-image.jpg", // 여기에 OG 이미지 경로를 지정
 				width: 1200,
 				height: 630,
 				alt: "Ruehan Blog",
@@ -32,7 +32,7 @@ export const metadata: Metadata = {
 		card: "summary_large_image",
 		title: "Ruehan Blog",
 		description: "개발 관련 지식과 경험을 공유하는 블로그입니다.",
-		images: ["/og-image.png"], // 트위터용 이미지
+		images: ["/og-image.jpg"], // 트위터용 이미지
 	},
 };
 
