@@ -1,0 +1,8 @@
+# public/robots.txt
+User-agent: *
+Allow: /
+Disallow: /private/
+Disallow: /api/
+
+Sitemap: https://ruehan.org/sitemap.xml
+Host: https://ruehan.org
