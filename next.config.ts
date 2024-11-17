@@ -8,6 +8,8 @@ const nextConfig: NextConfig = {
 		ignoreDuringBuilds: true,
 	},
 	output: "export",
+	assetPrefix: ".",
+	trailingSlash: true,
 };
 
 export default nextConfig;
