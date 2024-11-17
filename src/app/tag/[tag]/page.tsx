@@ -4,11 +4,12 @@ import Link from "next/link";
 import { format } from "date-fns";
 import { notFound } from "next/navigation";
 import { Metadata } from "next";
+import { getTagInEnglish, getTagInKorean } from "@/mapping";
 
 export async function generateStaticParams() {
 	const tags = await getAllTags();
 	return tags.map((tag) => ({
-		tag: encodeURIComponent(tag),
+		tag: getTagInEnglish(tag), // 한글 태그를 영어로 변환
 	}));
 }
 
@@ -18,17 +19,21 @@ interface Props {
 }
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
+	const decodedTag = decodeURIComponent(params.tag);
+	const koreanTag = getTagInKorean(decodedTag); // 영어 태그를 한글로 변환
 	return {
-		title: `#${decodeURIComponent(params.tag)} | Dev Blog`,
-		description: `Posts tagged with #${decodeURIComponent(params.tag)}`,
+		title: `#${koreanTag} | Dev Blog`,
+		description: `Posts tagged with #${koreanTag}`,
 	};
 }
 
 export default async function TagPage({ params }: { params: { tag: string } }) {
 	const decodedTag = decodeURIComponent(params.tag);
-	console.log(decodedTag);
+	const koreanTag = getTagInKorean(decodedTag); // 영어 태그를 한글로 변환
 	const posts = await getAllPosts();
-	const tagPosts = posts.filter((post) => post.tags.includes(decodedTag));
+	const tagPosts = posts.filter(
+		(post) => post.tags.some((tag) => getTagInEnglish(tag) === decodedTag) // 태그 매칭 시 영어 변환을 적용
+	);
 
 	if (tagPosts.length === 0) {
 		notFound();
@@ -37,7 +42,7 @@ export default async function TagPage({ params }: { params: { tag: string } }) {
 	return (
 		<div className="max-w-4xl mx-auto">
 			<header className="mb-8">
-				<h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-2">#{decodedTag}</h1>
+				<h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-2">#{koreanTag}</h1>
 				<p className="text-gray-600 dark:text-gray-400">{tagPosts.length} posts</p>
 			</header>
 
@@ -59,9 +64,10 @@ export default async function TagPage({ params }: { params: { tag: string } }) {
 							{post.tags.map((tag) => (
 								<Link
 									key={tag}
-									href={`/tag/${encodeURIComponent(tag)}`}
-									className={`px-3 py-1 bg-gray-100 dark:bg-gray-800 rounded-full text-sm
-                    ${tag === decodedTag ? "bg-blue-100 dark:bg-blue-900 text-blue-700 dark:text-blue-300" : "text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700"}`}
+									href={`/tag/${getTagInEnglish(tag)}`} // 한글 태그 -> 영어 변환
+									className={`px-3 py-1 bg-gray-100 dark:bg-gray-800 rounded-full text-sm ${
+										getTagInEnglish(tag) === decodedTag ? "bg-blue-100 dark:bg-blue-900 text-blue-700 dark:text-blue-300" : "text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700"
+									}`}
 								>
 									{tag}
 								</Link>
@@ -71,14 +77,14 @@ export default async function TagPage({ params }: { params: { tag: string } }) {
 				))}
 			</div>
 
-			{/* 관련 태그 섹션 추가 */}
+			{/* 관련 태그 섹션 */}
 			<div className="mt-12 pt-8 border-t border-gray-200 dark:border-gray-700">
 				<h2 className="text-xl font-bold text-gray-900 dark:text-white mb-4">Related Tags</h2>
 				<div className="flex flex-wrap gap-2">
-					{Array.from(new Set(tagPosts.flatMap((post) => post.tags).filter((tag) => tag !== decodedTag))).map((tag) => (
+					{Array.from(new Set(tagPosts.flatMap((post) => post.tags).filter((tag) => getTagInEnglish(tag) !== decodedTag))).map((tag) => (
 						<Link
 							key={tag}
-							href={`/tag/${encodeURIComponent(tag)}`}
+							href={`/tag/${getTagInEnglish(tag)}`} // 한글 태그 -> 영어 변환
 							className="px-3 py-1 bg-gray-100 dark:bg-gray-800 rounded-full text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700"
 						>
 							{tag}

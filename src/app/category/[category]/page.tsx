@@ -3,12 +3,13 @@ import { PostMeta } from "@/types/post";
 import Link from "next/link";
 import { format } from "date-fns";
 import { notFound } from "next/navigation";
-import { Metadata } from "next";
+import { GetStaticPaths, GetStaticProps, Metadata } from "next";
+import { CATEGORY_MAP, getCategoryInKorean } from "@/mapping";
 
 export async function generateStaticParams() {
-	const categories = await getAllCategories();
+	const categories = Object.keys(CATEGORY_MAP);
 	return categories.map((category) => ({
-		category: encodeURIComponent(category),
+		category,
 	}));
 }
 
@@ -18,17 +19,21 @@ interface Props {
 }
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
+	const categorySlug = decodeURIComponent(params.category);
+	const categoryInKorean = getCategoryInKorean(categorySlug);
+
 	return {
-		title: `${decodeURIComponent(params.category)} | Dev Blog`,
-		description: `Posts in category ${decodeURIComponent(params.category)}`,
+		title: `${categoryInKorean} | Dev Blog`,
+		description: `Posts in category ${categoryInKorean}`,
 	};
 }
 
 export default async function CategoryPage({ params }: { params: { category: string } }) {
-	const decodedCategory = decodeURIComponent(params.category);
-	console.log(decodedCategory);
+	const categorySlug = decodeURIComponent(params.category);
+	const categoryInKorean = getCategoryInKorean(categorySlug);
+
 	const posts = await getAllPosts();
-	const categoryPosts = posts.filter((post) => post.category === decodedCategory);
+	const categoryPosts = posts.filter((post) => post.category === categoryInKorean);
 
 	if (categoryPosts.length === 0) {
 		notFound();
@@ -37,7 +42,7 @@ export default async function CategoryPage({ params }: { params: { category: str
 	return (
 		<div className="max-w-4xl mx-auto">
 			<header className="mb-8">
-				<h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-2">Category: {decodedCategory}</h1>
+				<h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-2">Category: {categoryInKorean}</h1>
 				<p className="text-gray-600 dark:text-gray-400">{categoryPosts.length} posts</p>
 			</header>
 

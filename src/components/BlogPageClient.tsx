@@ -5,6 +5,7 @@ import Link from "next/link";
 import { PostMeta } from "@/types/post";
 import SearchBar from "@/components/SearchBar";
 import SearchResults from "@/components/SearchResults";
+import { CATEGORY_MAP, getCategoryInEnglish, getTagInEnglish } from "@/mapping";
 
 interface BlogPageClientProps {
 	initialPosts: PostMeta[];
@@ -26,13 +27,16 @@ export default function BlogPageClient({ initialPosts, categories, tags }: BlogP
 					<div>
 						<h2 className="text-xl font-bold mb-3 text-gray-900 dark:text-white">카테고리</h2>
 						<ul className="space-y-2">
-							{categories.map((category) => (
-								<li key={category}>
-									<Link href={`/category/${category}`} className="text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white">
-										{category}
-									</Link>
-								</li>
-							))}
+							{categories.map((category) => {
+								const categorySlug = getCategoryInEnglish(category);
+								return (
+									<li key={categorySlug}>
+										<Link href={`/category/${categorySlug}`} className="text-gray-600 hover:text-gray-900">
+											{category}
+										</Link>
+									</li>
+								);
+							})}
 						</ul>
 					</div>
 
@@ -40,11 +44,18 @@ export default function BlogPageClient({ initialPosts, categories, tags }: BlogP
 					<div>
 						<h2 className="text-xl font-bold mb-3 text-gray-900 dark:text-white">태그</h2>
 						<div className="flex flex-wrap gap-2">
-							{tags.map((tag) => (
-								<Link href={`/tag/${tag}`} key={tag} className="px-3 py-1 bg-gray-200 dark:bg-gray-700 rounded-full text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-300 dark:hover:bg-gray-600">
-									{tag}
-								</Link>
-							))}
+							{tags.map((tag) => {
+								const tagSlug = getTagInEnglish(tag);
+								return (
+									<Link
+										key={tagSlug}
+										href={`/tag/${tagSlug}`}
+										className="px-3 py-1 bg-gray-200 dark:bg-gray-700 rounded-full text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-300 dark:hover:bg-gray-600"
+									>
+										{tag}
+									</Link>
+								);
+							})}
 						</div>
 					</div>
 				</aside>
