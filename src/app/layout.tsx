@@ -1,4 +1,10 @@
+import { Inter } from "next/font/google";
+import "./globals.css";
+import { Providers } from "./providers";
+import RootLayout from "../components/RootLayout";
 import { Metadata } from "next";
+
+const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
 	title: {
@@ -6,10 +12,6 @@ export const metadata: Metadata = {
 		template: "%s | Ruehan Blog",
 	},
 	description: "개발 관련 지식과 경험을 공유하는 블로그입니다.",
-	keywords: ["Next.js", "React", "Web Development", "Programming"],
-	authors: [{ name: "Ruehan" }],
-	creator: "Ruehan",
-	metadataBase: new URL("https://ruehan.org"),
 	openGraph: {
 		type: "website",
 		locale: "ko_KR",
@@ -19,7 +21,7 @@ export const metadata: Metadata = {
 		description: "개발 관련 지식과 경험을 공유하는 블로그입니다.",
 		images: [
 			{
-				url: "/og-image.jpg",
+				url: "/og-image.png", // 여기에 OG 이미지 경로를 지정
 				width: 1200,
 				height: 630,
 				alt: "Ruehan Blog",
@@ -30,13 +32,18 @@ export const metadata: Metadata = {
 		card: "summary_large_image",
 		title: "Ruehan Blog",
 		description: "개발 관련 지식과 경험을 공유하는 블로그입니다.",
-		images: ["/og-image.jpg"],
-		creator: "@ruehan",
+		images: ["/og-image.png"], // 트위터용 이미지
 	},
-	icons: {
-		icon: "/favicon.ico",
-		shortcut: "/favicon-16x16.png",
-		apple: "/apple-touch-icon.png",
-	},
-	manifest: "/site.webmanifest",
 };
+
+export default function Layout({ children }: { children: React.ReactNode }) {
+	return (
+		<html lang="en" suppressHydrationWarning>
+			<body className={inter.className}>
+				<Providers attribute="class" defaultTheme="system" enableSystem>
+					<RootLayout>{children}</RootLayout>
+				</Providers>
+			</body>
+		</html>
+	);
+}
