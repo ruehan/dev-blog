@@ -11,6 +11,9 @@ export const TAG_MAP: { [key: string]: string } = {
 	dnssec: "DNSSEC",
 	secure: "보안",
 	googleanalytics: "Google Analytics",
+	react: "React",
+	openlayers: "OpenLayers",
+	ddang: "DDang",
 };
 
 export const getCategoryInKorean = (englishCategory: string): string => {
