@@ -1,0 +1,251 @@
+---
+title: "React와 OpenLayers를 활용한 산책 앱 구현: 지도"
+date: "2024-11-19"
+excerpt: "React와 OpenLayers를 사용하여 산책 앱을 개발하면서 겪었던 문제점들과 해결 방법, 그리고 구현 과정을 자세히 설명합니다."
+tags: ["React", "OpenLayers", "DDang"]
+category: "개발"
+---
+
+# React와 OpenLayers를 활용한 산책 앱 구현
+
+지난 프로젝트에서 React와 OpenLayers를 사용하여 산책 앱을 개발하면서 다양한 도전과 문제를 겪었습니다.
+이 글에서는 주요 문제점과 그 해결 방법, 그리고 앱을 구현하는 과정에서 주의해야 할 점들에 대해 자세히 설명하겠습니다.
+
+## 구현 방법
+
+### 1. React와 OpenLayers 통합
+
+React와 OpenLayers를 통합하는 과정은 다음과 같습니다:
+
+- **설치**: React 프로젝트에 OpenLayers 라이브러리를 설치합니다. **npm install ol** 명령어를 사용합니다.
+- **지도 생성 및 관리**: useRef 훅을 사용하여 지도 인스턴스를 참조합니다. useEffect 훅을 통해 지도를 초기화하고, 이벤트 핸들러를 등록합니다.
+
+```typescript
+const mapRef = useRef<Map | null>(null);
+const vectorSourceRef = useRef<VectorSource>(new VectorSource());
+
+useEffect(() => {
+	// 벡터 레이어 생성 (현재 위치 표시용)
+	const vectorLayer = new VectorLayer({
+		source: vectorSourceRef.current,
+		// 스타일 설정
+	});
+
+	// 지도 초기화
+	const map = new Map({
+		target: "map",
+		layers: [new TileLayer({ source: new OSM() }), vectorLayer],
+		view: new View({
+			center: fromLonLat([126.9784, 37.5666]), // 서울시청 기준
+			zoom: 18,
+		}),
+	});
+	mapRef.current = map;
+}, []);
+```
+
+### 2. 위치 추적 및 마커 업데이트
+
+- **위치 추적**: **navigator.geolocation**을 사용하여 현재 위치를 주기적으로 확인하고, 마커의 위치를 업데이트합니다.
+- **마커 애니메이션**: 지도와 마커의 이동을 부드럽게 하기 위해 **animate** 메서드를 사용합니다.
+
+```typescript
+useEffect(() => {
+	const intervalId = setInterval(() => {
+		navigator.geolocation.getCurrentPosition(
+			(position) => {
+				const coords = [position.coords.longitude, position.coords.latitude];
+
+				// 현재 위치에 마커 추가 또는 업데이트
+				if (markerRef.current) {
+					const point = markerRef.current.getGeometry() as Point;
+					const currentCoords = point.getCoordinates();
+					const targetCoords = fromLonLat(coords);
+
+					// 마커 위치 애니메이션
+					const duration = 2000; // 애니메이션 지속 시간 (ms)
+					const start = Date.now();
+					const animate = () => {
+						const elapsed = Date.now() - start;
+						const progress = Math.min(elapsed / duration, 1);
+						const easeProgress = easeOut(progress);
+						const x = currentCoords[0] + (targetCoords[0] - currentCoords[0]) * easeProgress;
+						const y = currentCoords[1] + (targetCoords[1] - currentCoords[1]) * easeProgress;
+						point.setCoordinates([x, y]);
+						if (progress < 1) {
+							requestAnimationFrame(animate);
+						}
+					};
+					animate();
+				} else {
+					markerRef.current = new Feature({
+						geometry: new Point(fromLonLat(coords)),
+					});
+					vectorSourceRef.current.addFeature(markerRef.current);
+				}
+
+				// 지도 뷰 애니메이션
+				mapRef.current?.getView().animate({
+					center: fromLonLat(coords),
+					duration: 500,
+				});
+			},
+			handleLocationError,
+			geoOptions
+		);
+	}, 5000);
+
+	return () => {
+		clearInterval(intervalId);
+	};
+}, []);
+```
+
+### 3. 지도 회전 및 나침반 데이터 사용
+
+- **나침반 데이터**: **DeviceOrientationEvent**를 통해 나침반 데이터를 받아 지도를 회전합니다.
+- **자동 회전**: **autoRotate** 상태를 통해 사용자가 지도 회전을 원하는지 확인하고, 이를 반영합니다.
+
+```typescript
+const rotateMap = (heading: number) => {
+	if (!mapRef.current || !autoRotate) return;
+	const view = mapRef.current.getView();
+	const rotation = (-heading * Math.PI) / 180; // 라디안으로 변환하고 반대 방향으로 회전
+
+	// 애니메이션을 통한 부드러운 회전
+	view.animate({
+		rotation: rotation,
+		duration: 250,
+	});
+};
+```
+
+### 4. 산책 관련 기능 구현
+
+- **isWalking 상태**: 산책 모드를 관리하고, 산책 시작/종료 시 필요한 로직을 실행합니다.
+- **시간 및 거리 계산**: **setInterval**을 사용하여 산책 시간을 계산하고, API 호출 조건을 설정하여 실제 이동 거리를 계산합니다.
+
+```typescript
+useEffect(() => {
+	if (isWalking) {
+		const intervalId = setInterval(() => {
+			setWalkTime((prev) => prev + 1);
+		}, 1000);
+		return () => clearInterval(intervalId);
+	}
+}, [isWalking]);
+```
+
+## 문제점 및 트러블슈팅
+
+### 1. 지도의 부드러운 이동과 애니메이션
+
+- **문제**: 지도의 위치가 갑작스럽게 변경되어 사용자 경험이 좋지 않았습니다.
+- **해결 방법**: **animate** 메서드를 사용하여 애니메이션 효과를 주었습니다.
+
+```typescript
+if (mapRef.current) {
+	mapRef.current.getView().animate({
+		center: fromLonLat(coords),
+		duration: 500,
+	});
+}
+```
+
+- **적용**: **mapRef.current.getView().animate** 메서드를 사용하여 지도의 중심이 부드럽게 이동하도록 했습니다. **duration** 옵션을 통해 애니메이션의 지속 시간을 설정했습니다.
+
+### 2. 나침반 권한 문제
+
+- **문제**: iOS 기기에서는 나침반 데이터를 얻기 위해 명시적인 권한이 필요했습니다.
+- **해결 방법**: **DeviceOrientationEvent.requestPermission**을 사용하여 권한을 요청했습니다.
+
+```typescript
+const requestCompassPermission = async () => {
+	if (DeviceOrientationEvent && typeof (DeviceOrientationEvent as any).requestPermission === "function") {
+		try {
+			const response = await (DeviceOrientationEvent as any).requestPermission();
+			setHasCompassPermission(response === "granted");
+		} catch (error) {
+			console.error("나침반 권한 요청 실패:", error);
+		}
+	} else {
+		setHasCompassPermission(true); // Android나 다른 기기의 경우
+	}
+};
+```
+
+- **적용**: **requestCompassPermission** 함수를 호출하여 사용자에게 나침반 데이터를 사용할 권한을 요청하고, 그에 따라 **hasCompassPermission** 상태를 업데이트합니다.
+
+### 3. 지도 회전 및 마커 이동
+
+- **문제**: 지도 회전과 마커 이동이 부드럽지 않아 사용자 경험이 나빴습니다.
+- **해결 방법**: **animate** 메서드와 **requestAnimationFrame**을 사용하여 부드러운 애니메이션을 구현했습니다.
+
+```typescript
+const rotateMap = (heading: number) => {
+	if (!mapRef.current || !autoRotate) return;
+
+	const view = mapRef.current.getView();
+	const rotation = (-heading * Math.PI) / 180; // 라디안으로 변환하고 반대 방향으로 회전
+
+	// 부드러운 회전을 위한 애니메이션
+	view.animate({
+		rotation: rotation,
+		duration: 250,
+	});
+};
+
+if (autoRotate) {
+	rotateMap(heading);
+}
+```
+
+- **적용**: **rotateMap** 함수를 통해 나침반 데이터를 받아 지도를 회전합니다. **animate** 메서드를 통해 부드러운 회전 효과를 줍니다.
+
+### 4. 위치 데이터 정확도 필터링
+
+- **문제**: 위치 데이터 정확도가 낮아 잘못된 데이터가 사용될 수 있었습니다.
+- **해결 방법**: **filterPosition** 함수를 사용하여 정확도 기준에 맞지 않는 데이터를 필터링했습니다.
+
+```typescript
+const filterPosition = (position: GeolocationPosition): boolean => {
+	const MIN_ACCURACY = 20; // 20미터 이상의 정확도만 허용
+	const isAccurate = position.coords.accuracy <= MIN_ACCURACY;
+	return isAccurate;
+};
+```
+
+- **적용**: **filterPosition** 함수를 통해 위치 데이터의 정확도를 확인하고, 기준 미달 데이터는 무시하여 정확한 데이터만 사용합니다.
+
+### 5. OpenRouteService 로컬 구현 필요성과 방법
+
+- **문제**: OpenRouteService를 외부 API로 호출할 때 통신 지연 및 비용 문제가 발생했습니다.
+- **해결 방법**: OpenRouteService를 로컬 서버로 구축하여 사용합니다.
+
+```typescript
+const ORS_API_URL = "http://localhost:8002/ors/v2/directions/foot-walking/geojson";
+```
+
+- **구현**: OpenRouteService를 설치하고, 로컬 환경에서 실행하여 API 호출합니다. 이를 통해 네트워크 지연을 줄이고, API 호출 비용을 절감할 수 있습니다.
+
+```text
+# OpenRouteService 설치 및 실행 명령어
+git clone https://github.com/GIScience/openrouteservice.git
+cd openrouteservice
+docker-compose up -d
+```
+
+- **적용**: **ORS_API_URL**로 로컬 서버 주소를 설정하여 **calculateRealDistance** 함수에서 사용합니다.
+
+자세한 내용은 [OpenRouteService 로컬 구축 방법](https://openrouteservice.org/dev/#/api-docs/directions/foot-walking/geojson)을 참고하세요.
+
+## 마무리하며
+
+React와 OpenLayers를 통한 산책 앱 구현은 다양한 기술적 문제를 해결해야 했습니다. 이 과정에서 얻은 인사이트는 다음과 같습니다:
+
+- **애니메이션**: 지도와 마커 이동에 애니메이션을 적용하여 사용자 경험을 개선합니다.
+- **데이터 필터링**: 정확도 낮은 데이터를 필터링하여 신뢰성 있는 정보를 제공합니다.
+- **권한 관리**: 특정 기기에서 필요한 권한을 관리하여 사용자에게 부드럽게 제공합니다.
+- **OpenRouteService 로컬 구현**: 외부 API의 제약을 극복하고, 로컬 환경에서 API를 실행하여 성능을 최적화합니다.
+
+이러한 문제점과 해결 방법을 통해, React와 OpenLayers를 사용한 산책 앱 개발이 더욱 효과적이고 사용자 친화적으로 진행될 수 있었습니다. 이 경험은 앞으로의 프로젝트에서 큰 도움이 될 것입니다.
