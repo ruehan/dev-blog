@@ -1,6 +1,7 @@
 export const CATEGORY_MAP: { [key: string]: string } = {
 	develop: "개발",
 	fe_develop: "프론트엔드",
+	ddang: "DDang",
 };
 
 export const TAG_MAP: { [key: string]: string } = {
@@ -13,7 +14,8 @@ export const TAG_MAP: { [key: string]: string } = {
 	googleanalytics: "Google Analytics",
 	react: "React",
 	openlayers: "OpenLayers",
-	ddang: "DDang",
+	docker: "Docker",
+	openrouteservice: "OpenRouteService",
 };
 
 export const getCategoryInKorean = (englishCategory: string): string => {
