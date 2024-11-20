@@ -1,0 +1,176 @@
+---
+title: "강아지 산책 앱 DDang 구현: OpenRouteService"
+date: "2024-11-20"
+excerpt: "OpenRouteService를 Docker에 설치하는 방법을 설명합니다."
+tags: ["React", "OpenRouteService", "Docker"]
+category: "DDang"
+---
+
+# Docker로 OpenRouteService 설치하기
+
+오늘은 OpenRouteService를 Docker를 이용해서 설치하는 방법을 알아보도록 하겠습니다.
+
+## OpenRouteService API의 한계
+
+OpenRouteService는 무료로 API를 제공하고 있지만, 다음과 같은 제한이 있습니다:
+
+- 일일 요청 제한: 2,000회
+- 분당 요청 제한: 40회
+- 배치 요청 제한: 최대 2개의 경유지
+
+실제 서비스를 운영하기에는 이러한 제한이 큰 걸림돌이 될 수 있습니다.
+그래서 오늘은 OpenRouteService를 로컬 환경에 직접 구축하는 방법을 알아보도록 하겠습니다.
+
+## OpenRouteService란?
+
+OpenRouteService는 오픈소스 경로 탐색 엔진입니다. OSM(OpenStreetMap) 데이터를 사용해서 경로를 찾아주는 서비스를 만들 수 있어요.
+
+### 1. 필요한 것들
+
+- Docker가 설치된 환경
+- 최소 4GB 이상의 RAM
+- OSM 데이터 파일 (.pbf)
+
+### 2. 프로젝트 구조 만들기
+
+먼저 다음과 같은 구조로 폴더를 만들어주세요:
+
+```text
+ors-docker/
+├── config/
+│   └── ors-config.yml
+├── logs/
+└── files/
+    └── south-korea-latest.osm.pbf
+```
+
+### 3. 설정 파일 작성하기
+
+config/ors-config.yml 파일을 다음과 같이 작성합니다:
+
+```yml
+server:
+  port: 8002
+  address: 0.0.0.0
+
+ors:
+  engine:
+    source_file: /home/ors/files/south-korea-latest.osm.pbf
+    profiles:
+      walking:
+        enabled: true
+        profile: foot-walking
+        preparation:
+          min_network_size: 200
+          methods:
+            lm:
+              enabled: true
+              threads: 1
+              weightings: fastest,shortest
+              landmarks: 16
+```
+
+### 4. Docker Compose 파일 작성하기
+
+프로젝트 루트에 docker-compose.yml 파일을 만들고 다음과 같이 작성합니다:
+
+```yml
+version: "3"
+services:
+  ors-app:
+    container_name: ors-app
+    image: openrouteservice/openrouteservice:latest
+    ports:
+      - "8002:8002"
+    volumes:
+      - ./ors-docker:/home/ors
+    environment:
+      - BUILD_GRAPHS=True
+      - JAVA_OPTS=-Xms1g -Xmx2g
+    user: "1000:1000"
+    restart: always
+```
+
+### 5. OSM(OpenStreetMap) 데이터 이해하기 (준비하기)
+
+OpenRouteService는 OSM 데이터를 기반으로 동작합니다. 우리가 사용하는 한국 지도 데이터를 살펴보면:
+
+```text
+2024-11-19 15:26:31 INFO [c.g.r.o.OSMReader                       ] - creating graph. Found nodes (pillar+tower):13 018 500, totalMB:1217, usedMB:512
+2024-11-19 15:26:31 INFO [c.g.r.d.CGIARProvider                   ] - cgiar Elevation Provider, from: https://srtm.csi.cgiar.org/wp-content/uploads/files/srtm_5x5/TIFF/, to: /home/ors/elevation_cache, as: MMAP_STORE using interpolate: false
+2024-11-19 15:26:43 INFO [c.g.r.o.OSMReader                       ] - 30 544 446, now parsing ways
+```
+
+위 로그를 보면 우리나라 전체 지도 데이터는:
+
+- 1,300만개 이상의 노드(교차점, 건물 등)
+- 3,000만개 이상의 웨이(도로, 경계선 등)
+  를 포함하고 있습니다.
+
+#### OSM 데이터 구성요소
+
+#### 1. 노드(Nodes)
+
+- 위도/경도 좌표를 가진 지점
+- 교차로, 건물 입구, 편의시설 위치 등
+- 우리나라의 경우 1,300만개의 노드 존재
+
+#### 2. 웨이(Ways)
+
+- 노드들을 연결한 선형 데이터
+- 도로, 철도, 강, 건물 외곽선 등
+- 우리나라의 경우 3,000만개의 웨이 존재
+
+#### 3. 실제 경로 탐색에 사용되는 데이터
+
+```text
+2024-11-19 15:31:31 INFO [o.h.o.r.RoutingProfile                  ] - [1] Edges: 2894751 - Nodes: 2159342.
+2024-11-19 15:31:31 INFO [o.h.o.r.RoutingProfile                  ] - [1] Total time: 316.451s.
+```
+
+- 노드: 약 216만개
+- 엣지(도로 구간): 약 289만개
+- 처리 시간: 약 5분 16초
+
+#### OSM 데이터 다운로드
+
+#### 1. 전체 데이터
+
+- https://download.geofabrik.de/asia/south-korea.html
+- 파일명: south-korea-latest.osm.pbf
+- 크기: 약 300MB
+
+#### 2. 지역별 데이터
+
+- https://extract.bbbike.org/
+- 원하는 지역만 잘라서 다운로드 가능
+- 서울만 사용할 경우 약 50MB 정도
+
+**다운로드 받은 .osm.pbf 파일을 ors-docker/files/ 폴더에 넣어주세요.**
+
+### 6. 실행하기
+
+모든 준비가 끝났다면, 다음 명령어로 실행합니다:
+
+```bash
+docker compose up -d
+```
+
+### 7. 확인하기
+
+서비스가 정상적으로 실행되었는지 확인하려면:
+
+```bash
+docker logs -f ors-app
+```
+
+- http://localhost:8002/ors/v2/health
+
+## 주의사항
+
+- 처음 실행할 때는 지도 데이터를 처리하느라 시간이 좀 걸립니다
+- 파일 권한 문제가 발생할 수 있으니 docker-compose.yml의 user 설정을 확인해주세요
+
+## 마무리
+
+이렇게 하면 기본적인 OpenRouteService 설치가 완료됩니다! 다음 글에서는 실제로 경로를 찾아보는 방법에 대해 알아보도록 하겠습니다.
