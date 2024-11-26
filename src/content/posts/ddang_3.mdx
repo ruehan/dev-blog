@@ -1,0 +1,289 @@
+---
+title: "강아지 산책 앱 DDang 구현: 핵심기능 구현과 성능 최적화"
+date: "2024-11-26"
+excerpt: "실시간 위치 추적 앱을 개발하면서 겪은 성능 최적화 여정을 공유합니다."
+tags: ["React", "OpenLayers", "성능 최적화", "위치기반서비스"]
+category: "DDang"
+---
+
+오늘은 반려동물 산책 앱을 개발하면서 겪었던 위치 기반 서비스의 성능 최적화 경험을 공유하려고 합니다.
+실시간으로 사용자의 위치를 추적하고 경로를 그리는 과정에서 마주친 다양한 문제들과 해결 방법을 소개해드릴게요.
+
+## 프로젝트 소개 🐕
+
+우리 팀이 개발한 앱은 반려동물 산책 경로를 기록하고, 다른 반려동물 보호자들과 실시간으로 만날 수 있는 서비스입니다.
+OpenLayers를 사용해 지도를 구현했고, React와 TypeScript로 개발했습니다.
+
+## 주요 도전 과제들 🎯
+
+### 1. 위치 데이터의 정확도 확보
+
+첫 번째 도전 과제는 정확한 위치 데이터를 얻는 것이었습니다.
+
+```typescript
+// 위치 데이터 정확도 필터링
+const filterPosition = (position: GeolocationPosition): boolean => {
+	const isAccurate = position.coords.accuracy <= MIN_ACCURACY;
+
+	// 도로 근처에 있는지 확인하는 로직 추가 가능
+	// 예: 주요 도로와의 거리를 계산하여 필터링
+
+	return isAccurate;
+};
+```
+
+위치 데이터 필터링은 다음과 같이 구현했습니다:
+
+#### 1.1 MIN_ACCURACY 기준값 설정
+
+- 30m를 기준으로 설정한 이유:
+  - 일반적인 스마트폰 GPS 오차 범위(10-50m) 고려
+  - 도심 지역에서의 실제 테스트 결과 반영
+  - 배터리 소모와 정확도의 최적 균형점
+
+#### 1.2 정확도 검증 로직
+
+- **position.coords.accuracy** 값 활용
+- 낮은 정확도의 데이터 자동 필터링
+- 실내/지하 등 GPS 신호가 약한 환경 대응
+
+### 2. 위치 업데이트 최적화
+
+```typescript
+// API 요청 조건을 만족할 때만 좌표 저장 및 경로 계산
+if (shouldCallApi(newPosition)) {
+	accumulatedPositionsRef.current.push(newPosition);
+	addWalkLocationMarker(coordinates);
+
+	if (accumulatedPositionsRef.current.length >= 2) {
+		const lastTwoPositions = accumulatedPositionsRef.current.slice(-2);
+		calculateWalkingDistance(lastTwoPositions);
+	}
+
+	lastApiCallTimeRef.current = Date.now();
+}
+
+updateEstimatedDistance();
+```
+
+#### 2.1 위치 데이터 수집 최적화를 위해:
+
+- shouldCallApi 조건 검사
+  - 최소 이동 거리 확인
+  - 시간 간격 체크
+  - 불필요한 API 호출 방지
+- 위치 데이터 누적 관리
+  - accumulatedPositionsRef 활용
+  - 메모리 효율적인 데이터 구조
+  - 실시간 거리 계산 지원
+
+### 3. 실시간 거리 계산
+
+```tyscript
+  // 직선 거리로 추정치 업데이트
+  const updateEstimatedDistance = () => {
+    const positions = accumulatedPositionsRef.current
+    if (positions.length < 2) return
+
+    let totalDistance = walkDistance // 이전까지의 실제 거리
+
+    // 마지막 API 호출 이후의 거리를 직거리로 계산
+    for (let i = 1; i < positions.length; i++) {
+      const distance = calculateDirectDistance(
+        positions[i - 1].lat,
+        positions[i - 1].lng,
+        positions[i].lat,
+        positions[i].lng
+      )
+      totalDistance += distance
+    }
+
+    setEstimatedDistance(totalDistance)
+  }
+```
+
+#### 3.1 하이브리드 거리 계산 시스템:
+
+사용자의 이동 거리를 계산하기 위해 하이브리드 거리 계산 시스템을 구현했습니다.
+
+OpenRoute Service API를 활용해 실제 도로 기반 거리를 계산하고, API가 응답하지 않을 때는 직선 거리를 계산해 실시간 거리를 추정하는 방법을 사용했습니다.
+
+[OpenRoute Service 로컬에 구현하기](https://ruehan.org/blog/ddang_2/)에서 자세한 내용을 확인할 수 있습니다.
+
+```typescript
+const calculateDirectDistance = (lat1: number, lon1: number, lat2: number, lon2: number): number => {
+	const R = 6371e3; // 지구의 반지름 (미터)
+	const φ1 = (lat1 * Math.PI) / 180;
+	const φ2 = (lat2 * Math.PI) / 180;
+	const Δφ = ((lat2 - lat1) * Math.PI) / 180;
+	const Δλ = ((lon2 - lon1) * Math.PI) / 180;
+
+	const a = Math.sin(Δφ / 2) * Math.sin(Δφ / 2) + Math.cos(φ1) * Math.cos(φ2) * Math.sin(Δλ / 2) * Math.sin(Δλ / 2);
+	const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+
+	return R * c; // 미터 단위 거리 반환
+};
+```
+
+- 직선 거리 계산
+  - Haversine Formula 활용
+  - 실시간 거리 추정
+  - API 응답 대기 시 임시 값 제공
+
+```typescript
+const calculateWalkingDistance = async (positions: { lat: number; lng: number }[]) => {
+	if (positions.length < 2) return;
+
+	try {
+		const coordinates = positions.map((pos) => [pos.lng, pos.lat]);
+
+		const response = await axios.post(ORS_API_URL, {
+			coordinates: coordinates,
+		});
+
+		if (!response.data.features?.[0]?.properties?.segments?.[0]?.distance) {
+			console.log("유효한 경로를 찾을 수 없습니다");
+			return;
+		}
+
+		// 새로운 구간의 거리를 누적
+		const segmentDistance = response.data.features[0].properties.summary.distance;
+		setWalkDistance((prev) => prev + segmentDistance);
+
+		// 새 경로 구간 그리기
+		const routeCoords = response.data.features[0].geometry.coordinates.map((coord: number[]) => fromLonLat(coord));
+
+		// 첫 번째 경로가 아닌 경우 append 모드로 그리기
+		const isFirstRoute = routeSourceRef.current.getFeatures().length === 0;
+		drawRoute(routeCoords, !isFirstRoute);
+
+		lastApiCallTimeRef.current = Date.now();
+	} catch (error) {
+		console.error("거리 계산 오류:", error);
+		updateEstimatedDistance();
+	}
+};
+```
+
+- 실제 도로 기반 거리 계산
+  - OpenRoute Service API 활용
+  - 실제 도로 경로 반영
+  - 정확한 이동 거리 측정
+
+### 4. 경로 시각화
+
+```typescript
+const drawRoute = (coordinates: number[][], append: boolean = false) => {
+	const routeStyle = new Style({
+		stroke: new Stroke({
+			color: "#FF6B6B", // 경로 색상 변경
+			width: 5, // 경로 두께 증가
+			lineCap: "round", // 경로 끝부분을 둥글게
+			lineJoin: "round", // 경로 연결부분을 둥글게
+		}),
+	});
+
+	if (!append) {
+		const lineString = new LineString(coordinates);
+		const feature = new Feature({
+			geometry: lineString,
+		});
+		feature.setStyle(routeStyle);
+		routeSourceRef.current.clear();
+		routeSourceRef.current.addFeature(feature);
+	} else {
+		const existingFeature = routeSourceRef.current.getFeatures()[0];
+		if (existingFeature) {
+			const existingLine = existingFeature.getGeometry() as LineString;
+			const existingCoords = existingLine.getCoordinates();
+			existingLine.setCoordinates([...existingCoords, ...coordinates.slice(1)]);
+			existingFeature.setStyle(routeStyle);
+		}
+	}
+};
+```
+
+```typescript
+const addWalkLocationMarker = (coordinates: number[]) => {
+	const marker = new Feature({
+		geometry: new Point(coordinates),
+	});
+
+	const markerStyle = new Style({
+		image: new Circle({
+			radius: 4,
+			fill: new Fill({ color: "#4CAF50" }),
+			stroke: new Stroke({
+				color: "#ffffff",
+				width: 2,
+			}),
+		}),
+	});
+
+	marker.setStyle(markerStyle);
+	vectorSourceRef.current.addFeature(marker);
+};
+```
+
+- 사용자 경험을 고려한 시각화:
+  - 스타일링 최적화
+  - 가시성 높은 색상 선택
+  - 부드러운 선 처리
+  - 직관적인 시각적 표현
+- 성능 고려사항
+  - 벡터 레이어 활용
+  - 메모리 효율적 구현
+  - 렌더링 최적화
+
+### 5. 나침반 기능 구현
+
+아래에서 진행할 **지도 회전 및 화면 방향 처리**를 위한 나침반 기능을 구현했습니다.
+
+```typescript
+const handleCompassPermission = async () => {
+	if (DeviceOrientationEvent && typeof (DeviceOrientationEvent as any).requestPermission === "function") {
+		try {
+			const response = await (DeviceOrientationEvent as any).requestPermission();
+			setHasCompassPermission(response === "granted");
+			if (response === "granted") {
+				setAutoRotate(true);
+				rotateMap(lastHeadingRef.current);
+			}
+		} catch (error) {
+			console.error("나침반 권한 요청 실패:", error);
+		}
+	} else {
+		setHasCompassPermission(true);
+		setAutoRotate(true);
+	}
+};
+```
+
+나침반 기능의 주요 특징:
+
+- iOS/Android 플랫폼 대응
+- 권한 요청 처리
+- 자동 회전 기능 구현
+
+### 6. 지도 회전 및 화면 방향 처리
+
+```typescript
+const rotateMap = (heading: number) => {
+	if (!mapRef.current) return;
+
+	const view = mapRef.current.getView();
+	const rotation = (-heading * Math.PI) / 180;
+
+	view.animate({
+		rotation: rotation,
+		duration: 250,
+		easing: easeOut,
+	});
+};
+```
+
+지도 회전 기능의 특징:
+
+- 부드러운 애니메이션 효과
+- 성능 최적화된 회전 처리
+- 직관적인 방향 표시
