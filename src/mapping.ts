@@ -16,6 +16,8 @@ export const TAG_MAP: { [key: string]: string } = {
 	openlayers: "OpenLayers",
 	docker: "Docker",
 	openrouteservice: "OpenRouteService",
+	performance_optimization: "성능 최적화",
+	location_based_service: "위치기반서비스",
 };
 
 export const getCategoryInKorean = (englishCategory: string): string => {
