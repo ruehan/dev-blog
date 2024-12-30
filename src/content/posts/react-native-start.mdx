@@ -1,0 +1,228 @@
+---
+title: "React Native 기초"
+date: "2024-12-31"
+excerpt: "React Native 공식 문서를 번역하고 정리한 포스트입니다."
+tags: ["React Native"]
+category: "개발"
+---
+
+# React Native의 핵심 컴포넌트 알아보기
+
+안녕하세요! 오늘은 React Native의 기본이 되는 컴포넌트들에 대해 알아볼게요.
+
+## React Native가 뭔가요?
+
+React Native는 React를 사용해서 안드로이드와 IOS 앱을 만들 수 있게 해주는 프레임워크예요.
+JavaScript로 코드를 작성하면, 각 플랫폼에 맞는 네이티브 앱으로 변환해준답니다!
+
+## 모바일 개발에서 View란?
+
+모바일 앱을 만들 때 가장 기본이 되는 것이 'View'예요. View는 화면에 보이는 모든 요소를 말하는데요:
+
+- 텍스트 한 줄
+- 버튼
+- 이미지
+- 등등...
+
+쉽게 말해서 화면에 보이는 모든 것들이 View라고 생각하시면 돼요!
+
+![Views in mobile development](https://reactnative.dev/docs/assets/diagram_IOS-android-views.svg)
+
+## 네이티브 컴포넌트란?
+
+원래 안드로이드는 Kotlin이나 Java로, IOS는 Swift나 Objective-C로 개발을 해요.
+하지만 React Native를 사용하면 JavaScript로 이런 네이티브 기능들을 사용할 수 있어요!
+
+React Native가 알아서 JavaScript 코드를 각 플랫폼에 맞는 네이티브 코드로 변환해주거든요.
+이렇게 변환된 컴포넌트들을 '네이티브 컴포넌트'라고 불러요.
+
+## 자주 사용하는 핵심 컴포넌트들
+
+### &lt;View&gt;
+
+역할: 레이아웃을 만드는 컨테이너 &lt;div&gt;
+
+Android: &lt;ViewGroup&gt;
+
+IOS: &lt;UIView&gt;
+
+웹 비교: &lt;div&gt;와 비슷해요
+
+사용 예: 다른 컴포넌트들을 감싸서 배치할 때 사용해요
+
+### &lt;Text&gt;
+
+역할: 텍스트를 보여주는 컴포넌트 &lt;p&gt;
+
+Android: &lt;TextView&gt;
+
+IOS: &lt;UITextView&gt;
+
+웹 비교: &lt;p&gt;나 &lt;span&gt;과 비슷해요
+
+사용 예: 화면에 글자를 표시할 때 사용해요
+
+### &lt;Image&gt;
+
+역할: 이미지를 표시하는 컴포넌트 &lt;img&gt;
+
+Android: &lt;ImageView&gt;
+
+IOS: &lt;UIImageView&gt;
+
+웹 비교: &lt;img&gt;와 비슷해요
+
+사용 예: 사진이나 아이콘을 보여줄 때 사용해요
+
+### &lt;ScrollView&gt;
+
+역할: 스크롤이 가능한 영역을 만드는 컴포넌트 &lt;div&gt;
+
+Android: &lt;ScrollView&gt;
+
+IOS: &lt;UIScrollView&gt;
+
+웹 비교: 스크롤이 되는 &lt;div&gt;와 비슷해요
+
+사용 예: 긴 내용을 스크롤해서 볼 수 있게 할 때 사용해요
+
+### &lt;TextInput&gt;
+
+역할: 사용자가 텍스트를 입력할 수 있는 컴포넌트 &lt;input type="text"&gt;
+
+Android: &lt;EditText&gt;
+
+IOS: &lt;UITextField&gt;
+
+웹 비교: &lt;input type="text"&gt;와 비슷해요
+
+사용 예: 검색창이나 로그인 폼에서 사용해요
+
+<iframe
+	src="https://snack.expo.dev/embedded/uisnnAA61TV2fRrZPvY8G"
+	style={{
+		width: "100%",
+		height: "500px",
+		border: "1px solid #ddd",
+		borderRadius: "4px",
+		overflow: "hidden",
+	}}
+/>
+
+## React의 기본 개념 이해하기
+
+React Native는 React를 기반으로 동작하기 때문에, React의 핵심 개념들을 이해하는 것이 중요해요.
+주요 개념들을 하나씩 살펴볼게요:
+
+### 첫 번째 컴포넌트 만들기
+
+간단한 Cat 컴포넌트를 만들어볼까요?
+
+<iframe
+	src="https://snack.expo.dev/embedded/Kdt4Cz5Y-TX7TAiuXOpOL"
+	style={{
+		width: "100%",
+		height: "500px",
+		border: "1px solid #ddd",
+		borderRadius: "4px",
+		overflow: "hidden",
+	}}
+/>
+
+### JSX 이해하기
+
+React와 React Native는 JSX라는 특별한 문법을 사용해요. JSX는 JavaScript 안에서 UI 요소를 표현할 수 있게 해주죠.
+예를 들어, 변수를 사용할 수도 있어요:
+
+<iframe
+	src="https://snack.expo.dev/embedded/hvs1fWh0NVB1VCpMPZyAt"
+	style={{
+		width: "100%",
+		height: "500px",
+		border: "1px solid #ddd",
+		borderRadius: "4px",
+		overflow: "hidden",
+	}}
+/>
+
+### Props 사용하기
+
+Props는 컴포넌트를 커스터마이징할 때 사용해요. 마치 함수의 매개변수처럼요:
+
+<iframe
+	src="https://snack.expo.dev/embedded/xCR1C7d2pv33eXvcSQv8E"
+	style={{
+		width: "100%",
+		height: "500px",
+		border: "1px solid #ddd",
+		borderRadius: "4px",
+		overflow: "hidden",
+	}}
+/>
+
+### State 다루기
+
+State는 컴포넌트의 데이터를 관리할 때 사용해요. 시간에 따라 변하는 데이터를 다룰 때 특히 유용하죠.
+
+<iframe
+	src="https://snack.expo.dev/embedded/RSVPvDMFixKV-nJzIfj32"
+	style={{
+		width: "100%",
+		height: "500px",
+		border: "1px solid #ddd",
+		borderRadius: "4px",
+		overflow: "hidden",
+	}}
+/>
+
+### 알아두면 좋은 점
+
+- Props는 컴포넌트의 설정값으로 생각하면 돼요
+- State는 컴포넌트의 내부 데이터로 생각하면 돼요
+- JSX에서 JavaScript 표현식은 중괄호 <code>{`{}`}</code>로 감싸서 사용해요
+- 스타일 객체를 전달할 때는 이중 중괄호 <code>{`{{}}`}</code>를 사용해요
+
+## TextInput으로 사용자 입력 다루기
+
+TextInput은 사용자가 텍스트를 입력할 수 있게 해주는 핵심 컴포넌트예요. 주요 기능들을 살펴볼까요?
+
+### 주요 Props
+
+- **onChangeText**: 텍스트가 변경될 때마다 호출되는 함수예요
+- **onSubmitEditing**: 텍스트 입력이 완료되고 제출될 때 호출되는 함수예요
+
+### 예시로 배워보기
+
+간단한 번역기를 만들어볼게요. 사용자가 입력하는 모든 단어를 피자 이모지(🍕)로 변환하는 재미있는 예제예요!
+
+<iframe
+	src="https://snack.expo.dev/embedded/epup_sU8I-SF0oEPRUOit"
+	style={{
+		width: "100%",
+		height: "500px",
+		border: "1px solid #ddd",
+		borderRadius: "4px",
+		overflow: "hidden",
+	}}
+/>
+
+### TextInput 활용 팁
+
+- 사용자가 입력하는 동안 실시간으로 텍스트를 검증할 수 있어요
+- 입력값을 state로 관리하면 시간에 따라 변하는 값을 쉽게 다룰 수 있어요
+- 다양한 키보드 타입을 지원해요 (이메일, 숫자, 전화번호 등)
+- 비밀번호 입력처럼 텍스트를 숨길 수도 있어요
+
+### 자주 사용하는 Props
+
+- **placeholder**: 입력 전에 보여줄 안내 텍스트
+- **value**: 입력 필드에 표시될 값
+- **secureTextEntry**: 비밀번호처럼 텍스트를 숨길지 여부
+- **keyboardType**: 키보드 종류 (default, numeric, email-address 등)
+- **multiline**: 여러 줄 입력 가능 여부
+
+TextInput은 사용자와 상호작용하는 가장 기본적인 방법 중 하나예요. 다음에는 다른 종류의 입력과 터치 이벤트를 다루는 방법에 대해 알아볼게요!
+
+---
+
+> 참고: 이 글은 [React Native 공식 문서](https://reactnative.dev/docs/intro-react-native-components)를 기반으로 작성되었습니다.
