@@ -215,13 +215,254 @@ TextInput은 사용자가 텍스트를 입력할 수 있게 해주는 핵심 컴
 
 ### 자주 사용하는 Props
 
-- **placeholder**: 입력 전에 보여줄 안내 텍스트
-- **value**: 입력 필드에 표시될 값
-- **secureTextEntry**: 비밀번호처럼 텍스트를 숨길지 여부
-- **keyboardType**: 키보드 종류 (default, numeric, email-address 등)
-- **multiline**: 여러 줄 입력 가능 여부
+- <code>placeholder</code>: 입력 전에 보여줄 안내 텍스트
+- <code>value</code>: 입력 필드에 표시될 값
+- <code>secureTextEntry</code>: 비밀번호처럼 텍스트를 숨길지 여부
+- <code>keyboardType</code>: 키보드 종류 (default, numeric, email-address 등)
+- <code>multiline</code>: 여러 줄 입력 가능 여부
 
-TextInput은 사용자와 상호작용하는 가장 기본적인 방법 중 하나예요. 다음에는 다른 종류의 입력과 터치 이벤트를 다루는 방법에 대해 알아볼게요!
+## ScrollView 사용하기
+
+ScrollView는 여러 컴포넌트와 뷰를 포함할 수 있는 스크롤 가능한 컨테이너예요. 다양한 종류의 컴포넌트를 넣을 수 있고, 가로와 세로 모두 스크롤이 가능해요!
+
+### ScrollView의 주요 특징
+
+**다양한 컴포넌트 포함**
+
+- 이미지, 텍스트 등 여러 종류의 컴포넌트를 함께 넣을 수 있어요
+- 수직, 수평 스크롤 모두 지원해요 (<code>horizontal</code> prop으로 설정)
+
+**페이징 기능**
+
+- <code>pagingEnabled</code> prop을 사용하면 스와이프로 페이지처럼 넘길 수 있어요
+- 안드로이드에서는 ViewPager 컴포넌트로도 구현 가능해요
+
+**IOS의 특별한 기능**
+
+- 단일 아이템의 경우 확대/축소가 가능해요
+- <code>maximumZoomScale</code>과 <code>minimumZoomScale</code> props로 설정할 수 있어요
+
+### 주의할 점
+
+ScrollView는 제한된 크기의 적은 수의 아이템을 보여줄 때 가장 적합해요. 왜냐하면:
+
+- ScrollView 안의 모든 요소가 한 번에 렌더링돼요
+- 화면에 보이지 않는 부분도 모두 메모리에 올라가요
+- 긴 리스트를 보여줄 때는 <code>FlatList</code>를 사용하는 것이 좋아요
+
+### 자주 사용하는 Props
+
+- <code>horizontal</code>: 가로 스크롤 여부
+- <code>pagingEnabled</code>: 페이지 단위 스크롤 여부
+- <code>showsHorizontalScrollIndicator</code>: 가로 스크롤바 표시 여부
+- <code>showsVerticalScrollIndicator</code>: 세로 스크롤바 표시 여부
+- <code>contentContainerStyle</code>: 내부 컨텐츠의 스타일 지정
+
+### 실제로 사용해보기
+
+아래 예제에서 ScrollView를 직접 사용해볼 수 있어요:
+
+<iframe
+	src="https://snack.expo.dev/embedded/7Bo6TN0jJfDGASa8QlSwh"
+	style={{
+		width: "100%",
+		height: "500px",
+		border: "1px solid #ddd",
+		borderRadius: "4px",
+		overflow: "hidden",
+	}}
+/>
+
+### 언제 ScrollView를 사용할까?
+
+- 적은 수의 항목을 스크롤하고 싶을 때
+- 모든 내용을 한 번에 렌더링해도 괜찮을 때
+- 다양한 종류의 컴포넌트를 함께 스크롤하고 싶을 때
+
+긴 리스트를 표시해야 한다면 다음 섹션에서 배울 <code>FlatList</code>를 사용하는 것이 좋아요!
+
+## ListView 사용하기
+
+React Native에서는 데이터 목록을 표시하기 위한 두 가지 주요 컴포넌트를 제공해요:
+
+- <code>FlatList</code>: 일반적인 목록을 위한 컴포넌트
+- <code>SectionList</code>: 섹션으로 구분된 목록을 위한 컴포넌트
+
+### FlatList 이해하기
+
+FlatList는 ScrollView와 달리 화면에 보이는 항목만 렌더링하기 때문에 긴 목록을 효율적으로 표시할 수 있어요.
+
+#### FlatList의 주요 Props
+
+- <code>data</code>: 표시할 데이터 배열
+- <code>renderItem</code>: 각 항목을 어떻게 표시할지 정의하는 함수
+- <code>keyExtractor</code>: 각 항목의 고유 키를 지정하는 함수
+
+### FlatList vs ScrollView
+
+**ScrollView의 경우:**
+
+- 모든 항목을 한 번에 렌더링해요
+- 적은 수의 항목에 적합해요
+- 메모리 사용량이 많아요
+
+**FlatList의 경우:**
+
+- 화면에 보이는 항목만 렌더링해요
+- 많은 수의 항목에 적합해요
+- 메모리를 효율적으로 사용해요
+
+### SectionList 사용하기
+
+데이터를 섹션별로 구분해서 보여주고 싶을 때 사용해요. iOS의 UITableView와 비슷한 형태예요.
+
+#### SectionList의 주요 Props
+
+- <code>sections</code>: 섹션 데이터 배열
+- <code>renderItem</code>: 각 항목을 렌더링하는 함수
+- <code>renderSectionHeader</code>: 섹션 헤더를 렌더링하는 함수
+
+### 실제로 사용해보기
+
+아래 예제에서 FlatList와 SectionList를 직접 사용해볼 수 있어요:
+
+<iframe
+	src="https://snack.expo.dev/embedded/5WLLSBA8OJVbczNb-typy"
+	style={{
+		width: "100%",
+		height: "500px",
+		border: "1px solid #ddd",
+		borderRadius: "4px",
+		overflow: "hidden",
+	}}
+/>
+
+<iframe
+	src="https://snack.expo.dev/embedded/KDbI6QES5qYz6v7y7Zzzj"
+	style={{
+		width: "100%",
+		height: "500px",
+		border: "1px solid #ddd",
+		borderRadius: "4px",
+		overflow: "hidden",
+	}}
+/>
+
+### 언제 어떤 ListView를 사용할까?
+
+**FlatList 사용하기 좋은 경우:**
+
+- 단순한 목록을 표시할 때
+- 데이터 항목의 구조가 동일할 때
+- 목록이 길거나 데이터가 자주 변경될 때
+
+**SectionList 사용하기 좋은 경우:**
+
+- 데이터를 카테고리별로 구분해야 할 때
+- 섹션 헤더가 필요할 때
+- iOS 스타일의 그룹화된 목록이 필요할 때
+
+### 성능 최적화 팁
+
+- <code>keyExtractor</code>를 항상 구현하세요
+- 가능하면 항목의 높이를 고정하세요
+- <code>getItemLayout</code>을 사용해 스크롤 성능을 개선하세요
+- 큰 이미지는 적절히 리사이징하세요
+
+## 플랫폼별 코드 작성하기
+
+크로스 플랫폼 앱을 만들 때는 가능한 많은 코드를 재사용하고 싶겠지만, 때로는 Android와 IOS에서 다르게 동작해야 할 때가 있어요. React Native에서는 두 가지 방법으로 플랫폼별 코드를 작성할 수 있어요:
+
+1. Platform 모듈 사용하기
+2. 플랫폼별 파일 확장자 사용하기
+
+### Platform 모듈 사용하기
+
+Platform 모듈을 사용하면 현재 앱이 실행 중인 플랫폼을 감지할 수 있어요. 컴포넌트의 일부분만 플랫폼별로 다르게 처리하고 싶을 때 유용해요.
+
+```jsx
+import { Platform, StyleSheet } from "react-native";
+const styles = StyleSheet.create({
+	height: Platform.OS === "ios" ? 200 : 100,
+});
+```
+
+<code>Platform.select</code> 메서드를 사용하면 더 편리하게 플랫폼별 값을 지정할 수 있어요:
+
+```jsx
+const styles = StyleSheet.create({
+	container: {
+		flex: 1,
+		...Platform.select({
+			ios: {
+				backgroundColor: "red",
+			},
+			android: {
+				backgroundColor: "green",
+			},
+			default: {
+				backgroundColor: "blue",
+			},
+		}),
+	},
+});
+```
+
+### 플랫폼별 파일 확장자 사용하기
+
+코드가 더 복잡해진다면, 아예 파일을 분리하는 것이 좋아요. React Native는 <code>.ios.</code>나 <code>.android.</code> 확장자를 자동으로 인식해요.
+
+예를 들어, 프로젝트에 다음과 같은 파일들이 있다면:
+
+```text
+BigButton.ios.js
+BigButton.android.js
+```
+
+이렇게 임포트하면 됩니다:
+
+```jsx
+import BigButton from "./BigButton";
+```
+
+React Native가 실행 중인 플랫폼에 맞는 파일을 자동으로 선택해줘요!
+
+### 웹과 코드 공유하기
+
+React Native와 웹(ReactJS) 사이에서 코드를 공유하고 싶다면 <code>.native.js</code> 확장자를 사용할 수 있어요:
+
+```text
+Container.js # 웹 번들러가 사용
+Container.native.js # React Native 번들러가 사용
+```
+
+### 플랫폼 버전 감지하기
+
+#### Android 버전 감지
+
+```jsx
+import { Platform } from "react-native";
+if (Platform.Version === 25) {
+	console.log("누가(Nougat)에서 실행 중!");
+}
+```
+
+#### iOS 버전 감지
+
+```jsx
+import { Platform } from "react-native";
+const majorVersionIOS = parseInt(Platform.Version, 10);
+if (majorVersionIOS <= 9) {
+	console.log("iOS 9 이하에서의 동작 처리");
+}
+```
+
+### 알아두면 좋은 점
+
+- Platform.OS는 IOS에서는 'ios', Android에서는 'android'를 반환해요
+- Platform.select를 사용하면 더 깔끔한 코드를 작성할 수 있어요
+- 복잡한 플랫폼별 로직은 파일을 분리하는 것이 좋아요
+- 웹 지원이 필요하다면 .native.js 확장자를 활용하세요
 
 ---
 
