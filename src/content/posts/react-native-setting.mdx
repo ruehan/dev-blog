@@ -126,14 +126,15 @@ choco install -y nodejs-lts microsoft-openjdk17
 2. 사용자 계정 → 사용자 계정 → 환경 변수 변경
 3. 새로 만들기를 클릭해서 <code>ANDROID_HOME</code> 변수 생성:
 
-   ```cmd
-   %LOCALAPPDATA%\Android\Sdk
-   ```
+```cmd
+%LOCALAPPDATA%\Android\Sdk
+```
 
 4. Path 변수에 platform-tools 경로 추가:
-   ```cmd
-   %LOCALAPPDATA%\Android\Sdk\platform-tools
-   ```
+
+```cmd
+%LOCALAPPDATA%\Android\Sdk\platform-tools
+```
 
 > 💡 설정이 제대로 되었는지 확인하려면:
 >
@@ -159,19 +160,20 @@ choco install -y nodejs-lts microsoft-openjdk17
 
 ### 자주 발생하는 문제들
 
-1. **JDK 버전 문제**
+**JDK 버전 문제**
 
-   - 최신 버전의 JDK를 사용한다면 Gradle 버전을 업그레이드해야 할 수 있어요
-   - <code>`{프로젝트 루트}/android/gradle/wrapper/gradle-wrapper.properties`</code> 파일에서 <code>distributionUrl</code> 값을 수정하세요
+- 최신 버전의 JDK를 사용한다면 Gradle 버전을 업그레이드해야 할 수 있어요
+- <code>프로젝트 루트/android/gradle/wrapper/gradle-wrapper.properties</code> 파일에서 <code>distributionUrl</code> 값을 수정하세요
 
-2. **HAXM 설치 문제**
+**HAXM 설치 문제**
 
-   - AMD CPU를 사용하는 경우 대신 Windows Hypervisor Platform을 사용하세요
-   - Hyper-V가 활성화되어 있다면 HAXM과 충돌할 수 있어요
+- AMD CPU를 사용하는 경우 대신 Windows Hypervisor Platform을 사용하세요
+- Hyper-V가 활성화되어 있다면 HAXM과 충돌할 수 있어요
 
-3. **환경 변수 문제**
-   - 새 명령 프롬프트를 열어서 환경 변수가 제대로 적용되었는지 확인하세요
-   - SDK 경로는 Android Studio의 Settings → Languages & Frameworks → Android SDK에서 확인할 수 있어요
+**환경 변수 문제**
+
+- 새 명령 프롬프트를 열어서 환경 변수가 제대로 적용되었는지 확인하세요
+- SDK 경로는 Android Studio의 Settings → Languages & Frameworks → Android SDK에서 확인할 수 있어요
 
 ---
 
