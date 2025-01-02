@@ -1,0 +1,256 @@
+---
+title: "React Native 환경 설정"
+date: "2025-01-02"
+excerpt: "React Native 환경 설정 방법에 대해 알아보는 포스트입니다."
+tags: ["React Native"]
+category: "개발"
+---
+
+# React Native 개발 환경 설정하기
+
+React Native 앱을 개발하기 위해서는 먼저 개발 환경을 설정해야 해요. Android Studio와 Xcode를 사용해서 앱을 실행하고 빌드할 수 있도록 준비해볼게요.
+
+## macOS 환경 설정하기
+
+### 1. 필수 도구 설치하기
+
+먼저 Homebrew를 통해 Node와 Watchman을 설치해야 해요:
+
+```bash
+brew install node
+brew install watchman
+```
+
+> 💡 Node는 18.18 버전 이상이어야 해요.
+> Watchman은 파일 시스템의 변경사항을 감지하는 Facebook의 도구예요.
+
+### 2. Java Development Kit (JDK) 설치
+
+Homebrew를 통해 Azul Zulu OpenJDK를 설치해볼게요:
+
+```bash
+brew install --cask zulu@17
+```
+
+설치 후 환경변수를 설정해주세요 (~/.zshrc 또는 ~/.bash_profile):
+
+```bash
+export JAVA_HOME=/Library/Java/JavaVirtualMachines/zulu-17.jdk/Contents/Home
+```
+
+### 3. Android 개발 환경 설정
+
+#### Android Studio 설치
+
+1. [Android Studio를 다운로드](https://developer.android.com/studio)하고 설치해주세요
+2. 설치 시 다음 항목들을 꼭 체크해주세요:
+   - Android SDK
+   - Android SDK Platform
+   - Android Virtual Device
+
+#### Android SDK 설정
+
+1. Android Studio의 SDK Manager를 실행해주세요 (More Actions → SDK Manager)
+2. <code>Android 15 (VanillaIceCream)</code> SDK를 설치: - Android SDK Platform 35 - Intel x86 Atom_64 System Image 또는 - Google APIs Intel x86 Atom System Image - (M1 Mac의 경우) Google APIs ARM 64 v8a
+   System Image
+
+![Android SDK](https://reactnative.dev/assets/images/GettingStartedAndroidStudioWelcomeMacOS-64c618ea062865fedece6dd5f7b78fa4.png)
+
+#### 환경 변수 설정
+
+~/.zshrc (또는 ~/.bash_profile)에 다음을 추가해주세요:
+
+```bash
+export ANDROID_HOME=$HOME/Library/Android/sdk
+export PATH=$PATH:$ANDROID_HOME/emulator
+export PATH=$PATH:$ANDROID_HOME/platform-tools
+```
+
+### 4. iOS 개발 환경 설정
+
+#### Xcode 설치
+
+1. Mac App Store에서 최신 버전의 Xcode를 설치해주세요
+2. Xcode Command Line Tools도 설치해주세요:
+   - Xcode → Settings → Locations → Command Line Tools
+
+![Xcode Command Line Tools](https://reactnative.dev/assets/images/GettingStartedXcodeCommandLineTools-7ddc121ba824227ca88a078b9ad9105e.png)
+
+#### iOS Simulator 설치
+
+1. Xcode → Settings → Platforms
+2. 원하는 iOS 버전의 시뮬레이터를 설치해주세요
+
+#### CocoaPods 설치
+
+iOS 의존성 관리를 위해 CocoaPods를 설치해주세요:
+
+```bash
+sudo gem install cocoapods
+```
+
+## Windows에서 개발 환경 설정하기
+
+### 1. 필수 도구 설치하기
+
+Windows에서는 Chocolatey라는 패키지 매니저를 통해 필요한 도구들을 설치할 수 있어요.
+
+관리자 권한으로 Command Prompt를 실행하고 (Command Prompt에서 우클릭 후 "관리자 권한으로 실행") 다음 명령어를 입력하세요:
+
+```cmd
+choco install -y nodejs-lts microsoft-openjdk17
+```
+
+> 💡 Node.js는 18.18 버전 이상이어야 해요.
+> JDK는 17 버전을 추천해요. 더 높은 버전에서는 문제가 발생할 수 있어요.
+
+### 2. Android 개발 환경 설정
+
+#### Android Studio 설치
+
+1. [Android Studio를 다운로드](https://developer.android.com/studio)하고 설치해주세요
+2. 설치 시 다음 항목들을 꼭 체크해주세요:
+   - Android SDK
+   - Android SDK Platform
+   - Android Virtual Device
+   - Performance (Intel ® HAXM) (AMD나 Hyper-V를 사용하지 않는 경우)
+
+#### Android SDK 설정
+
+1. Android Studio의 SDK Manager를 실행해주세요
+2. <code>Android 15 (VanillaIceCream)</code> SDK를 설치: - Android SDK Platform 35 - Intel x86 Atom_64 System Image 또는 - Google APIs Intel x86 Atom System Image
+
+#### 환경 변수 설정
+
+1. Windows 제어판 열기
+2. 사용자 계정 → 사용자 계정 → 환경 변수 변경
+3. 새로 만들기를 클릭해서 <code>ANDROID_HOME</code> 변수 생성:
+
+   ```cmd
+   %LOCALAPPDATA%\Android\Sdk
+   ```
+
+4. Path 변수에 platform-tools 경로 추가:
+   ```cmd
+   %LOCALAPPDATA%\Android\Sdk\platform-tools
+   ```
+
+> 💡 설정이 제대로 되었는지 확인하려면:
+>
+> 1. PowerShell을 열고
+> 2. <code>Get-ChildItem -Path Env:\</code> 명령어를 실행해서
+> 3. <code>ANDROID_HOME</code>이 있는지 확인하세요
+
+### 3. Android 기기 준비하기
+
+#### 실제 기기 사용
+
+1. USB 케이블로 기기 연결
+2. 개발자 옵션과 USB 디버깅 활성화
+
+#### 가상 기기 (에뮬레이터) 사용
+
+1. Android Studio의 AVD Manager 실행
+2. "Create Virtual Device" 선택
+3. Phone 카테고리에서 기기 선택
+4. VanillaIceCream API Level 35 이미지 선택
+
+> 💡 HAXM이 설치되어 있지 않다면 "Install HAXM"을 클릭하거나 [설치 가이드](https://github.com/intel/haxm)를 따라 설치하세요
+
+### 자주 발생하는 문제들
+
+1. **JDK 버전 문제**
+
+   - 최신 버전의 JDK를 사용한다면 Gradle 버전을 업그레이드해야 할 수 있어요
+   - <code>`{프로젝트 루트}/android/gradle/wrapper/gradle-wrapper.properties`</code> 파일에서 <code>distributionUrl</code> 값을 수정하세요
+
+2. **HAXM 설치 문제**
+
+   - AMD CPU를 사용하는 경우 대신 Windows Hypervisor Platform을 사용하세요
+   - Hyper-V가 활성화되어 있다면 HAXM과 충돌할 수 있어요
+
+3. **환경 변수 문제**
+   - 새 명령 프롬프트를 열어서 환경 변수가 제대로 적용되었는지 확인하세요
+   - SDK 경로는 Android Studio의 Settings → Languages & Frameworks → Android SDK에서 확인할 수 있어요
+
+---
+
+> 참고: 이 내용은 [React Native 공식 문서의 Environment Setup](https://reactnative.dev/docs/set-up-your-environment)을 기반으로 작성되었습니다.
+
+## React Native 프로젝트 시작하기
+
+프레임워크 없이 React Native 프로젝트를 시작하는 방법을 알아볼게요.
+
+### 1. 새 프로젝트 만들기
+
+먼저, 전역에 설치된 <code>react-native-cli</code>가 있다면 제거해주세요:
+
+```bash
+npm uninstall -g react-native-cli @react-native-community/cli
+```
+
+이제 React Native Community CLI를 사용해서 새 프로젝트를 만들어볼게요:
+
+```bash
+npx @react-native-community/cli@latest init AwesomeProject
+```
+
+> 💡 IOS에서 문제가 발생한다면:
+>
+> 1. <code>cd ios</code> 명령어로 ios 폴더로 이동
+> 2. <code>bundle install</code>로 Bundler 설치
+> 3. <code>bundle exec pod install</code>로 IOS 의존성 설치
+
+#### 특정 버전이나 템플릿 사용하기
+
+특정 버전의 React Native로 시작하고 싶다면 <code>--version</code> 인자를 사용할 수 있어요:
+
+```bash
+npx @react-native-community/cli@X.XX.X init AwesomeProject --version X.XX.X
+```
+
+### 2. Metro 시작하기
+
+Metro는 React Native의 JavaScript 빌드 도구예요. 웹 개발의 Vite나 webpack 같은 거라고 생각하시면 돼요.
+프로젝트 폴더에서 다음 명령어로 Metro를 실행해보세요:
+
+```bash
+npm start
+(or)
+yarn start
+```
+
+### 3. 앱 실행하기
+
+Metro를 실행한 상태에서 새 터미널을 열고 다음 명령어를 실행하세요:
+
+```bash
+npm run android
+(or)
+yarn android
+
+npm run ios
+(or)
+yarn ios
+```
+
+제대로 설정되었다면 Android 에뮬레이터에서 새 앱이 실행될 거예요.
+Android Studio에서 직접 실행할 수도 있어요.
+
+### 4. 앱 수정하기
+
+이제 앱을 수정해볼까요?
+
+1. <code>App.tsx</code> 파일을 텍스트 에디터로 열어서 수정해보세요
+2. R키를 두 번 누르거나 개발자 메뉴(Ctrl + M)에서 'Reload'를 선택하면 변경사항을 확인할 수 있어요!
+
+### 알아두면 좋은 점
+
+- Metro는 JSX 같은 문법을 실행 가능한 JavaScript로 변환해줘요
+- 기존 앱에 React Native를 추가하고 싶다면 Integration 가이드를 참고하세요
+- Android Studio에서 직접 앱을 실행할 수도 있어요
+- 문제가 발생하면 공식 문서의 Troubleshooting 페이지를 확인해보세요
+
+---
+
+> 참고: 이 내용은 [React Native 공식 문서의 Get Started Without a Framework](https://reactnative.dev/docs/getting-started-without-a-framework)를 기반으로 작성되었습니다.
