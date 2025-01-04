@@ -1,0 +1,204 @@
+---
+title: "React Native 워크플로우"
+date: "2025-01-03"
+excerpt: "React Native 워크플로우를 알아보는 포스트입니다."
+tags: ["React Native"]
+category: "개발"
+---
+
+# React Native 앱을 실제 기기에서 실행하기
+
+앱을 사용자에게 배포하기 전에 실제 기기에서 테스트하는 것이 중요해요. 각 플랫폼별로 어떻게 실제 기기에서 앱을 실행하고 테스트할 수 있는지 알아볼게요.
+
+## Android 기기에서 실행하기
+
+### 1. USB 디버깅 활성화하기
+
+기본적으로 대부분의 Android 기기는 Google Play에서 다운로드한 앱만 설치할 수 있어요. 개발 중인 앱을 설치하려면 USB 디버깅을 활성화해야 해요.
+
+1. **설정** → **휴대폰 정보** → **소프트웨어 정보**로 이동
+2. <code>빌드번호</code>를 7번 연속으로 탭
+3. **설정** → **개발자 옵션**으로 돌아가서 "USB 디버깅" 활성화
+
+### 2. USB로 기기 연결하기
+
+1. USB 케이블로 기기를 컴퓨터에 연결
+2. 터미널에서 다음 명령어로 기기가 제대로 연결됐는지 확인:
+
+```shell
+$ adb devices
+List of devices attached
+emulator-5554 offline   # Google emulator
+14ed2fcc device
+```
+
+> 💡 <code>unauthorized</code>가 표시되면 <code>adb reverse tcp:8081 tcp:8081</code> 명령어를 실행하고 기기에서 USB 디버깅을 허용해주세요.
+
+### 3. 앱 실행하기
+
+프로젝트 루트 폴더에서 다음 명령어 실행:
+
+```shell
+npm run android
+# 또는
+yarn android
+```
+
+## IOS 기기에서 실행하기 (macOS 필요)
+
+### 1. USB로 기기 연결
+
+1. USB 케이블로 iOS 기기를 Mac에 연결
+2. <code>ios</code> 폴더의 <code>.xcworkspace</code> 파일을 Xcode로 열기
+3. 처음이라면 기기를 개발용으로 등록해야 해요:
+   - Xcode 메뉴 → **Product** → **Destination**
+   - 목록에서 기기 선택
+
+### 2. 코드 서명 설정
+
+1. Apple 개발자 계정이 필요해요
+2. Xcode Project Navigator에서 프로젝트 선택
+3. "General" 탭 → "Signing" 섹션
+4. Team 드롭다운에서 개발자 계정/팀 선택
+5. Tests 타겟에서도 같은 과정 반복
+
+![Running On Device Code Signing](https://reactnative.dev/assets/images/RunningOnDeviceCodeSigning-daffe4c45a59c3f5031b35f6b24def1d.png)
+
+### 3. 빌드 및 실행
+
+1. Xcode 툴바에서 기기가 빌드 대상으로 선택되었는지 확인
+2. Build and run 버튼(⌘ + R) 클릭 또는 Product 메뉴에서 Run 선택
+
+## 개발 서버에 연결하기
+
+USB나 Wi-Fi를 통해 개발 서버에 연결하면 빠르게 개발할 수 있어요.
+
+![debugging-dev-menu](https://reactnative.dev/assets/images/debugging-dev-menu-076-f2f50e00c40ec72dede2d760c174b987.jpg)
+
+### 방법 1: adb reverse 사용 (Android)
+
+Android 5.0 이상, USB 디버깅이 활성화된 기기에서 사용 가능:
+
+```shell
+adb -s <기기이름> reverse tcp:8081 tcp:8081
+```
+
+### 방법 2: Wi-Fi 연결
+
+1. 컴퓨터와 기기가 같은 Wi-Fi 네트워크에 연결되어 있어야 해요
+2. 컴퓨터의 IP 주소 확인
+   - Windows: <code>ipconfig</code>
+   - macOS: <code>ifconfig</code>
+3. 앱에서 개발자 메뉴 열기
+4. **Dev Settings** → **Debug server host & port for device**
+5. <code>[컴퓨터IP]:8081</code> 입력 (예: <code>10.0.1.1:8081</code>)
+6. **Reload JS** 선택
+
+## 프로덕션용 빌드하기
+
+앱스토어나 플레이스토어에 출시할 준비가 되었다면:
+
+### Android
+
+- 서명된 APK 생성이 필요해요
+- <code>yarn android --mode release</code> 명령어로 릴리즈 빌드 생성 가능
+
+### iOS
+
+- App Store Connect에 앱 등록
+- Xcode에서 Archive 생성
+- App Store에 제출
+
+## 자주 발생하는 문제들
+
+**"bridge configuration isn't available" 에러**
+
+- <code>adb reverse</code> 명령어 실행 확인
+
+**Wi-Fi 연결 문제**
+
+- 같은 네트워크 연결 확인
+- 방화벽/보안 설정 확인
+- USB 테더링으로 대체 가능
+
+**iOS 빌드 실패**
+
+- 코드 서명 설정 확인
+- 프로비저닝 프로파일 확인
+- <code>pod install</code> 재실행
+
+# Fast Refresh 이해하기
+
+Fast Refresh는 React Native에서 제공하는 강력한 기능이에요. 코드를 수정했을 때 거의 실시간으로 변경사항을 확인할 수 있게 해주죠.
+기본적으로 활성화되어 있고, React Native 개발자 메뉴에서 "Enable Fast Refresh" 옵션으로 켜고 끌 수 있어요.
+
+## Fast Refresh는 어떻게 동작할까요?
+
+### 1. React 컴포넌트만 있는 경우
+
+- 해당 모듈의 코드만 업데이트하고 컴포넌트를 다시 렌더링해요
+- 스타일, 렌더링 로직, 이벤트 핸들러, 효과 등 모든 것을 수정할 수 있어요
+
+### 2. React 컴포넌트가 아닌 것을 내보내는 경우
+
+- 해당 모듈과 이를 가져오는(import) 다른 모듈들도 함께 다시 실행돼요
+- 예: <code>Theme.js</code>를 <code>Button.js</code>와 <code>Modal.js</code>에서 import한다면, <code>Theme.js</code> 수정 시 두 컴포넌트 모두 업데이트
+
+### 3. React 트리 외부에서 사용되는 파일을 수정하는 경우
+
+- 전체 리로드가 발생해요
+- 이런 경우는 상수를 별도의 파일로 분리하는 것이 좋아요
+
+## 에러 처리는 어떻게 되나요?
+
+### 1. 문법 에러 (Syntax Error)
+
+- 에러를 수정하고 저장하면 빨간 화면(redbox)이 사라져요
+- 문법 에러가 있는 모듈은 실행되지 않아요
+
+### 2. 모듈 초기화 중 런타임 에러
+
+- 예: <code>Style.create</code> 대신 <code>StyleSheet.create</code> 사용
+- 에러 수정 후 Fast Refresh 세션이 계속돼요
+
+### 3. 컴포넌트 내부의 런타임 에러
+
+- 에러 수정 후에도 Fast Refresh 세션이 유지돼요
+- React가 수정된 코드로 앱을 다시 마운트해요
+
+## 제한사항
+
+Fast Refresh는 안전한 경우에만 React의 로컬 상태를 유지해요. 다음과 같은 경우에는 매번 상태가 초기화될 수 있어요:
+
+1. 클래스 컴포넌트의 경우 (함수 컴포넌트와 Hooks만 상태 유지)
+2. React 컴포넌트 외에 다른 것도 export하는 모듈
+3. HOC(Higher-Order Component)를 사용하는 경우
+
+## 유용한 팁들
+
+### 상태 관리
+
+- 함수 컴포넌트와 Hooks의 로컬 상태는 기본적으로 유지돼요
+- 강제로 상태를 초기화하고 싶다면 파일에 <code>// @refresh reset</code> 주석을 추가하세요
+
+### Hooks와 함께 사용하기
+
+**상태 보존**
+
+- <code>useState</code>와 <code>useRef</code>는 인자나 호출 순서가 바뀌지 않으면 이전 값을 유지해요
+
+**의존성이 있는 Hooks**
+
+- <code>useEffect</code>, <code>useMemo</code>, <code>useCallback</code>은 Fast Refresh 중에는 항상 다시 실행돼요
+- 의존성 배열은 Fast Refresh 동안 무시돼요
+- 예: <code>useMemo(() => x + 2, [x])</code>를 <code>useMemo(() => x + 10, [x])</code>로 수정하면 <code>x</code>가 변경되지 않았어도 다시 실행
+
+## 성능 최적화 팁
+
+- <code>useEffect</code>가 가끔 다시 실행되어도 문제없도록 코드를 작성하세요
+- 나중에 의존성을 추가하기 쉬워져요
+- 큰 변경사항은 전체 리로드가 발생할 수 있으니 작은 단위로 수정하세요
+
+---
+
+> 참고: 이 내용은 [React Native 공식 문서의 Running On Device](https://reactnative.dev/docs/running-on-device), [React Native 공식 문서의 Fast Refresh](https://reactnative.dev/docs/fast-refresh)를 기반으로 작성되었습니다.
