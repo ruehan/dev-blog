@@ -199,6 +199,112 @@ Fast Refresh는 안전한 경우에만 React의 로컬 상태를 유지해요. �
 - 나중에 의존성을 추가하기 쉬워져요
 - 큰 변경사항은 전체 리로드가 발생할 수 있으니 작은 단위로 수정하세요
 
+# Metro 번들러 이해하기
+
+Metro는 React Native의 JavaScript 코드와 에셋을 빌드하는 번들러예요. 웹 개발에서의 webpack이나 vite 같은 역할을 한다고 생각하시면 돼요.
+
+## Metro 설정하기
+
+Metro의 설정은 프로젝트의 <code>metro.config.js</code> 파일에서 커스터마이징할 수 있어요. 이 파일은 두 가지 방식으로 설정할 수 있습니다:
+
+### 1. 객체 방식 (권장)
+
+Metro의 기본 설정 위에 덮어쓸 설정을 객체로 정의하는 방식이에요.
+
+```js
+const { getDefaultConfig, mergeConfig } = require("@react-native/metro-config");
+
+/**
+ * Metro configuration
+ * https://metrobundler.dev/docs/configuration
+ *
+ * @type {import('metro-config').MetroConfig}
+ */
+const config = {};
+
+module.exports = mergeConfig(getDefaultConfig(__dirname), config);
+```
+
+### 2. 함수 방식 (고급)
+
+더 세밀한 제어가 필요할 때 사용하는 방식이에요. Metro의 기본 설정을 직접 관리해야 해요.
+
+```js
+const { getDefaultConfig, mergeConfig } = require("@react-native/metro-config");
+module.exports = function (baseConfig) {
+	const defaultConfig = mergeConfig(baseConfig, getDefaultConfig(dirname));
+	const {
+		resolver: { assetExts, sourceExts },
+	} = defaultConfig;
+	return mergeConfig(defaultConfig, {
+		resolver: {
+			assetExts: assetExts.filter((ext) => ext !== "svg"),
+			sourceExts: [...sourceExts, "svg"],
+		},
+	});
+};
+```
+
+## 자주 사용하는 설정 예시
+
+### 1. 소스 파일 확장자 추가하기
+
+예를 들어, SVG 파일을 소스 코드로 처리하고 싶을 때:
+
+```js
+const config = {
+	resolver: {
+		sourceExts: ["js", "ts", "tsx", "svg"],
+	},
+};
+```
+
+### 2. 에셋 확장자 관리하기
+
+특정 파일 형식을 에셋으로 처리하고 싶을 때:
+
+```js
+const config = {
+	resolver: {
+		assetExts: ["png", "jpg", "gif"],
+	},
+};
+```
+
+## 유용한 팁들
+
+**설정값 직접 명시하기**
+
+- 기본값을 복사해서 수정하는 것이 좋아요
+- 설정 파일에 모든 값을 명시적으로 작성하면 관리가 쉬워져요
+
+**기본 설정 활용하기**
+
+- <code>@react-native/metro-config</code>의 기본값을 활용하세요
+- 필요한 부분만 오버라이드하면 돼요
+
+**성능 최적화**
+
+- 불필요한 파일 형식은 제외하세요
+- 빌드 시간을 단축할 수 있어요
+
+## 자주 발생하는 문제들
+
+**빌드 속도가 느릴 때**
+
+- 캐시를 정리해보세요: <code>npx react-native start --reset-cache</code>
+- 불필요한 파일 형식이 포함되어 있는지 확인하세요
+
+**파일을 찾지 못할 때**
+
+- <code>sourceExts</code>와 <code>assetExts</code> 설정을 확인하세요
+- 파일 경로가 올바른지 확인하세요
+
+**SVG 파일 처리 문제**
+
+- <code>react-native-svg-transformer</code> 설치
+- Metro 설정에서 SVG 확장자 처리 방법 수정
+
 ---
 
 > 참고: 이 내용은 [React Native 공식 문서의 Running On Device](https://reactnative.dev/docs/running-on-device), [React Native 공식 문서의 Fast Refresh](https://reactnative.dev/docs/fast-refresh)를 기반으로 작성되었습니다.
