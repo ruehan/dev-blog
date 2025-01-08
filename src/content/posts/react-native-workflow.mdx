@@ -556,6 +556,71 @@ yarn add --dev babel-plugin-module-resolver
 - [React의 TypeScript 문서](https://react.dev/learn/typescript)
 - [React + TypeScript Cheatsheets](https://github.com/typescript-cheatsheets/react)
 
+# React Native 버전 업그레이드하기
+
+React Native의 새로운 버전으로 업그레이드하면 더 많은 API, 뷰, 개발자 도구 등을 사용할 수 있어요. 업그레이드는 약간의 노력이 필요하지만, 가능한 한 쉽게 진행할 수 있도록 도와드릴게요.
+
+## Expo 프로젝트 업그레이드
+
+Expo 프로젝트를 업그레이드하려면 <code>package.json</code> 파일에서 다음 패키지들의 버전을 업데이트해야 해요:
+
+- <code>react-native</code>
+- <code>react</code>
+- <code>expo</code>
+
+> 💡 Expo는 SDK 버전을 한 번에 하나씩 점진적으로 업그레이드하는 것을 추천해요. 이렇게 하면 업그레이드 과정에서 발생하는 문제를 쉽게 찾을 수 있어요.
+
+## React Native 프로젝트 업그레이드
+
+React Native 프로젝트는 Android 프로젝트, iOS 프로젝트, JavaScript 프로젝트로 구성되어 있어서 업그레이드가 조금 까다로울 수 있어요. 하지만 [Upgrade Helper](https://react-native-community.github.io/upgrade-helper/)라는 웹 도구를 사용하면 쉽게 업그레이드할 수 있어요.
+
+### 1. 버전 선택하기
+
+- 현재 버전과 업그레이드하려는 버전을 선택하세요
+- 기본적으로 최신 메이저 버전이 선택되어 있어요
+- "Show me how to upgrade" 버튼을 클릭하세요
+
+> 💡 메이저 업데이트의 경우 상단에 도움이 되는 "useful content" 섹션이 표시돼요.
+
+### 2. 의존성 업그레이드하기
+
+먼저 <code>package.json</code>에 표시된 의존성을 업데이트해야 해요. 예를 들어, <code>react-native</code>와 <code>react</code>가 변경사항으로 표시된다면:
+
+```shell
+# {{VERSION}}과 {{REACT_VERSION}}은 diff에 표시된 릴리스 버전입니다
+npm install react-native@{{VERSION}}
+npm install react@{{REACT_VERSION}}
+# 또는
+yarn add react-native@{{VERSION}}
+yarn add react@{{REACT_VERSION}}
+
+```
+
+### 3. 프로젝트 파일 업그레이드하기
+
+새 릴리스에는 <code>npx react-native init</code> 실행 시 생성되는 다른 파일들의 업데이트가 포함될 수 있어요:
+
+- 이러한 파일들은 Upgrade Helper 페이지의 <code>package.json</code> 다음에 나열돼요
+- 변경사항이 없다면 프로젝트를 다시 빌드하기만 하면 돼요
+- 변경사항이 있다면 수동으로 프로젝트에 적용해야 해요
+
+## 문제 해결하기
+
+### 모든 변경을 적용했는데도 앱이 여전히 이전 버전을 사용할 때
+
+이런 문제는 주로 캐시와 관련이 있어요. 해결 방법:
+
+1. <code>react-native-clean-project</code> 설치하기
+2. 프로젝트의 모든 캐시를 정리하기
+3. 앱 다시 실행하기
+
+### 유용한 팁
+
+- 메이저 버전 업그레이드는 한 번에 하나씩 진행하세요
+- 업그레이드 전에 항상 변경사항을 커밋해두세요
+- 테스트 코드가 있다면 각 단계마다 실행해보세요
+- Breaking Changes를 꼭 확인하세요
+
 ---
 
 > 참고: 이 내용은 [React Native 공식 문서의 Running On Device](https://reactnative.dev/docs/running-on-device), [React Native 공식 문서의 Fast Refresh](https://reactnative.dev/docs/fast-refresh)를 기반으로 작성되었습니다.
