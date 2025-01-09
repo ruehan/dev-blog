@@ -1,0 +1,323 @@
+---
+title: "React Native UI & Interaction"
+date: "2025-01-08"
+excerpt: "React Native UI & Interaction"
+tags: ["React Native"]
+category: "개발"
+---
+
+# UI
+
+## 스타일
+
+React Native에서는 JavaScript를 사용해서 앱의 스타일을 지정해요. 모든 핵심 컴포넌트들은 <code>style</code>이라는 prop을 받을 수 있답니다.
+
+스타일 이름과 값은 보통 웹에서 사용하는 CSS와 비슷하지만, 카멜 케이스(camelCase)로 작성한다는 점이 달라요.
+예를 들어, <code>background-color</code>는 <code>backgroundColor</code>로 작성해야 해요.
+
+<code>style</code> prop은 JavaScript 객체를 받을 수 있어요. 또한 배열을 전달할 수도 있는데, 이 경우 배열의 마지막 스타일이 우선 적용된답니다.
+
+앱에서 스타일을 정의할 때는 <code>StyleSheet.create</code>를 사용하는 것이 좋아요:
+
+<iframe
+	src="https://snack.expo.dev/embedded/KhIeZUfvyBvvUN60QJAOP"
+	style={{
+		width: "100%",
+		height: "500px",
+		border: "1px solid #ddd",
+		borderRadius: "4px",
+		overflow: "hidden",
+	}}
+/>
+
+React Native에서는 웹의 CSS처럼 자동으로 스타일이 상속되지 않아요.
+텍스트 스타일을 상속하고 싶다면 컴포넌트 계층 구조의 모든 단계에서 명시적으로 스타일을 지정해야 해요.
+
+## 높이와 너비
+
+컴포넌트의 높이와 너비는 화면에서의 크기를 결정해요.
+
+### 고정 크기
+
+컴포넌트의 크기를 지정하는 일반적인 방법은 스타일에 고정된 <code>width</code>와 <code>height</code>를 추가하는 거예요. React Native에서 모든 크기는 단위가 없으며, 밀도 독립적 픽셀을 나타내요.
+
+<iframe
+	src="https://snack.expo.dev/embedded/3kQKGhba9wuIR7rJYuYjy"
+	style={{
+		width: "100%",
+		height: "500px",
+		border: "1px solid #ddd",
+		borderRadius: "4px",
+		overflow: "hidden",
+	}}
+/>
+
+이런 방식으로 크기를 지정하는 것은 화면 크기에 따라 계산되지 않고 항상 특정 포인트로 고정되어야 하는 컴포넌트에서 흔히 사용돼요.
+
+> 주의: 포인트에서 실제 물리적 측정 단위로의 변환은 보편적이지 않아요. 이는 고정 크기를 가진 컴포넌트가 서로 다른 기기와 화면 크기에서 동일한 물리적 크기를 갖지 않을 수 있다는 걸 의미해요. 하지만 대부분의 경우 이러한 차이는 눈에 띄지 않아요.
+
+### 유동적인 크기
+
+컴포넌트가 사용 가능한 공간에 따라 동적으로 확장하거나 축소되게 하려면 스타일에 <code>flex</code>를 사용하세요. 보통 <code>flex: 1</code>을 사용하는데, 이는 컴포넌트에게 같은 부모를 가진 다른 컴포넌트들과 동일하게 나누어 사용 가능한 모든 공간을 채우라고 지시하는 거예요.
+
+<iframe
+	src="https://snack.expo.dev/embedded/CdJ2cd-t-ncr50lE2XgUi"
+	style={{
+		width: "100%",
+		height: "500px",
+		border: "1px solid #ddd",
+		borderRadius: "4px",
+		overflow: "hidden",
+	}}
+/>
+
+<code>flex</code> 값이 클수록 형제 컴포넌트들과 비교해서 더 많은 공간을 차지하게 돼요.
+
+> 참고: 컴포넌트는 부모가 0보다 큰 크기를 가질 때만 사용 가능한 공간을 채울 수 있어요. 부모가 고정된 <code>width</code>와 <code>height</code> 또는 <code>flex</code>를 가지고 있지 않다면, 부모의 크기는 0이 되고 <code>flex</code>를 가진 자식 컴포넌트들은 보이지 않게 될 거예요.
+
+컴포넌트의 크기를 제어할 수 있게 되면, 다음 단계는 화면에서 어떻게 배치할지 배우는 거예요.
+
+### 퍼센트 크기
+
+화면의 특정 부분을 채우고 싶지만 <code>flex</code> 레이아웃을 사용하고 싶지 않다면, 컴포넌트의 스타일에 **퍼센트 값**을 사용할 수 있어요. flex 크기와 비슷하게, 퍼센트 크기도 정의된 크기를 가진 부모가 필요해요.
+
+<iframe
+	src="https://snack.expo.dev/embedded/EBQSxGNtgK_fpK3m9RJ-s"
+	style={{
+		width: "100%",
+		height: "500px",
+		border: "1px solid #ddd",
+		borderRadius: "4px",
+		overflow: "hidden",
+	}}
+/>
+
+# Flexbox로 레이아웃 만들기
+
+컴포넌트는 Flexbox 알고리즘을 사용해서 자식 요소들의 레이아웃을 지정할 수 있어요. Flexbox는 다양한 화면 크기에서 일관된 레이아웃을 제공하도록 설계되었죠.
+
+보통 원하는 레이아웃을 만들기 위해서는 <code>flexDirection</code>, <code>alignItems</code>, <code>justifyContent</code>를 조합해서 사용하게 될 거예요.
+
+> 주의: React Native의 Flexbox는 웹의 CSS Flexbox와 거의 동일하게 작동하지만, 몇 가지 차이점이 있어요:
+>
+> - 기본값이 다릅니다: <code>flexDirection</code>은 <code>row</code> 대신 <code>column</code>이 기본값이에요
+> - <code>alignContent</code>는 <code>stretch</code> 대신 <code>flex-start</code>가 기본값이에요
+> - <code>flexShrink</code>는 <code>1</code> 대신 <code>0</code>이 기본값이에요
+> - <code>flex</code> 속성은 단일 숫자만 지원해요
+
+## Flex
+
+flex는 메인 축을 따라 사용 가능한 공간을 아이템들이 어떻게 **"채울지"** 정의해요. 공간은 각 요소의 flex 속성에 따라 나눠져요.
+
+<iframe
+	src="https://snack.expo.dev/embedded/6UH26cZMm5FpaJS7s77xZ"
+	style={{
+		width: "100%",
+		height: "500px",
+		border: "1px solid #ddd",
+		borderRadius: "4px",
+		overflow: "hidden",
+	}}
+/>
+
+## Flex Direction
+
+flexDirection은 컨테이너 안에서 자식 요소들이 배치되는 방향을 제어해요. 이를 주축(main axis)이라고도 해요. 교차 축(cross axis)은 주축과 수직인 축이에요.
+
+- <code>column</code> (**기본값**) 자식 요소들을 위에서 아래로 정렬해요.{" "}
+- <code>row</code> 자식 요소들을 왼쪽에서 오른쪽으로 정렬해요.{" "}
+- <code>column-reverse</code> 자식 요소들을 아래에서 위로 정렬해요.{" "}
+- <code>row-reverse</code> 자식 요소들을 오른쪽에서 왼쪽으로 정렬해요.{" "}
+
+<iframe
+	src="https://snack.expo.dev/embedded/fCBs9YQyaBE8rst0l1ktq"
+	style={{
+		width: "100%",
+		height: "500px",
+		border: "1px solid #ddd",
+		borderRadius: "4px",
+		overflow: "hidden",
+	}}
+/>
+
+## 레이아웃 방향
+
+레이아웃 방향은 계층 구조에서 자식 요소들과 텍스트가 배치되어야 하는 방향을 지정해요.
+
+- <code>LTR</code> (**기본값**) 텍스트와 자식 요소들이 왼쪽에서 오른쪽으로 배치돼요.
+- <code>RTL</code> 텍스트와 자식 요소들이 오른쪽에서 왼쪽으로 배치돼요.
+
+<iframe
+	src="https://snack.expo.dev/embedded/Ez_qrvWw9fqpsFxJJabeK"
+	style={{
+		width: "100%",
+		height: "500px",
+		border: "1px solid #ddd",
+		borderRadius: "4px",
+		overflow: "hidden",
+	}}
+/>
+
+## Justify Content
+
+justifyContent는 주축을 따라 자식 요소들을 어떻게 배치할지 정의해요. 예를 들어, <code>flexDirection</code>이 <code>row</code>라면 가로 방향으로, <code>column</code>이라면 세로 방향으로 배치하는 방법을 결정하죠.
+
+- <code>flex-start</code> (**기본값**) 자식 요소들을 컨테이너의 시작점에 배치해요.
+- <code>flex-end</code> 자식 요소들을 컨테이너의 끝점에 배치해요.
+- <code>center</code> 자식 요소들을 컨테이너의 중앙에 배치해요.
+- <code>space-between</code> 자식 요소들 사이에 동일한 간격을 두고 배치해요.
+- <code>space-around</code> 자식 요소들의 주변에 동일한 간격을 두고 배치해요.
+- <code>space-evenly</code> 자식 요소들과 양 끝에 동일한 간격을 두고 배치해요.
+
+<iframe
+	src="https://snack.expo.dev/embedded/I6_LiHBIAVU-t72JWS0cm"
+	style={{
+		width: "100%",
+		height: "500px",
+		border: "1px solid #ddd",
+		borderRadius: "4px",
+		overflow: "hidden",
+	}}
+/>
+
+## Align Items
+
+alignItems는 교차 축을 따라 자식 요소들을 어떻게 배치할지 정의해요. flexDirection이 `row`라면 세로 방향으로, `column`이라면 가로 방향으로 배치하는 방법을 결정하죠.
+
+- <code>stretch</code> (**기본값**) 자식 요소들을 컨테이너에 맞게 늘려요.
+- <code>flex-start</code> 자식 요소들을 컨테이너의 시작점에 배치해요.
+- <code>flex-end</code> 자식 요소들을 컨테이너의 끝점에 배치해요.
+- <code>center</code> 자식 요소들을 컨테이너의 중앙에 배치해요.
+- <code>baseline</code> 자식 요소들을 컨테이너의 텍스트 기준선에 배치해요.
+
+<iframe
+	src="https://snack.expo.dev/embedded/UeLVauPRItTud95sHuIhp"
+	style={{
+		width: "100%",
+		height: "500px",
+		border: "1px solid #ddd",
+		borderRadius: "4px",
+		overflow: "hidden",
+	}}
+/>
+
+## Align Self
+
+alignSelf는 개별 자식 요소에 대해 alignItems와 다른 정렬을 설정할 수 있어요. 기본값은 <code>auto</code>예요.
+
+- <code>auto</code> (**기본값**) 부모의 alignItems 값을 상속받아요.
+- <code>stretch</code> 자식 요소를 컨테이너에 맞게 늘려요.
+- <code>flex-start</code> 자식 요소를 컨테이너의 시작점에 배치해요.
+- <code>flex-end</code> 자식 요소를 컨테이너의 끝점에 배치해요.
+- <code>center</code> 자식 요소를 컨테이너의 중앙에 배치해요.
+- <code>baseline</code> 자식 요소를 컨테이너의 텍스트 기준선에 배치해요.
+
+<iframe
+	src="https://snack.expo.dev/embedded/WlO0VnhM_jbkV_93TY5B4"
+	style={{
+		width: "100%",
+		height: "500px",
+		border: "1px solid #ddd",
+		borderRadius: "4px",
+		overflow: "hidden",
+	}}
+/>
+
+## Align Content
+
+alignContent는 교차 축을 따라 각 줄 사이의 간격을 어떻게 배치할지 정의해요. 이 속성은 flexWrap이 'wrap'으로 설정되어 있고 여러 줄의 아이템이 있을 때만 효과가 있어요.
+
+- <code>flex-start</code> (**기본값**) 줄들을 컨테이너의 시작점에 배치해요.
+- <code>flex-end</code> 줄들을 컨테이너의 끝점에 배치해요.
+- <code>stretch</code> 줄들을 컨테이너에 맞게 늘려요.
+- <code>center</code> 줄들을 컨테이너의 중앙에 배치해요.
+- <code>space-between</code> 줄들 사이에 동일한 간격을 두고 배치해요.
+- <code>space-around</code> 줄들의 주변에 동일한 간격을 두고 배치해요.
+
+<iframe
+	src="https://snack.expo.dev/embedded/6HVal__5Ecx9_B0MDfq8z"
+	style={{
+		width: "100%",
+		height: "500px",
+		border: "1px solid #ddd",
+		borderRadius: "4px",
+		overflow: "hidden",
+	}}
+/>
+
+## Flex Wrap
+
+기본적으로 자식 요소들은 한 줄에 모두 들어가려고 해요. flexWrap을 사용하면 이를 변경할 수 있어요.
+
+- <code>nowrap</code> (**기본값**) 자식 요소들을 한 줄에 배치해요.
+- <code>wrap</code> 자식 요소들을 여러 줄에 걸쳐 배치해요.
+- <code>wrap-reverse</code> 자식 요소들을 여러 줄에 걸쳐 반대 방향으로 배치해요.
+
+<iframe
+	src="https://snack.expo.dev/embedded/dq4OsHuStrnWEUS8mCjcn"
+	style={{
+		width: "100%",
+		height: "500px",
+		border: "1px solid #ddd",
+		borderRadius: "4px",
+		overflow: "hidden",
+	}}
+/>
+
+## Flex Basis, Grow, and Shrink
+
+- <code>flexBasis</code> 자식 요소의 기본 크기를 지정해요. <code>width</code>와 비슷하지만 더 유연해요.
+- <code>flexGrow</code> 자식 요소가 필요한 경우 늘어날 수 있는지를 결정해요.
+- <code>flexShrink</code> 자식 요소가 필요한 경우 줄어들 수 있는지를 결정해요.
+
+<iframe
+	src="https://snack.expo.dev/embedded/iesJDGuQXKzu-eixgiVBK"
+	style={{
+		width: "100%",
+		height: "500px",
+		border: "1px solid #ddd",
+		borderRadius: "4px",
+		overflow: "hidden",
+	}}
+/>
+
+## Width and Height
+
+컴포넌트의 치수를 지정하는 방법은 여러 가지가 있어요:
+
+- <code>width</code>와 <code>height</code>: 고정된 치수를 지정해요.
+- 퍼센트: 부모 컴포넌트에 상대적인 치수를 지정해요.
+- <code>flex</code>: 사용 가능한 공간에 따라 치수가 조정돼요.
+
+<iframe
+	src="https://snack.expo.dev/embedded/BKAvykU6mW2RGdFmlocEB"
+	style={{
+		width: "100%",
+		height: "500px",
+		border: "1px solid #ddd",
+		borderRadius: "4px",
+		overflow: "hidden",
+	}}
+/>
+
+## 절대와 상대 레이아웃
+
+컴포넌트의 position 타입은 자식 요소들이 어떻게 배치될지를 결정해요:
+
+- <code>relative</code> (**기본값**) 컴포넌트는 일반적인 흐름에 따라 배치되고, 그 다음에 top, right, bottom, left 값에 따라 오프셋이 적용돼요.
+- <code>absolute</code> 컴포넌트는 일반적인 흐름에서 벗어나 가장 가까운 position이 지정된 부모를 기준으로 배치돼요.
+
+<iframe
+	src="https://snack.expo.dev/embedded/bMZF4fBGU4W3wjvGzQv9b"
+	style={{
+		width: "100%",
+		height: "500px",
+		border: "1px solid #ddd",
+		borderRadius: "4px",
+		overflow: "hidden",
+	}}
+/>
+
+## 더 알아보기
+
+더 자세한 내용은 [Yoga](https://yogalayout.com/)를 확인해보세요. React Native의 레이아웃 엔진이에요.
