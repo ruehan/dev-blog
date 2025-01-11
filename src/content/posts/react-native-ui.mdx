@@ -523,3 +523,31 @@ return (
 ```
 
 width와 height 스타일 속성을 반드시 지정해야 한다는 점을 기억하세요.
+
+## iOS 테두리 반경 스타일
+
+다음의 모서리별 테두리 반경 스타일 속성들은 iOS의 이미지 컴포넌트에서 무시될 수 있다는 점에 주의하세요:
+
+- <code>borderTopLeftRadius</code>
+- <code>borderTopRightRadius</code>
+- <code>borderBottomLeftRadius</code>
+- <code>borderBottomRightRadius</code>
+
+## 비동기 디코딩
+
+이미지 디코딩은 프레임 시간보다 오래 걸릴 수 있어요. 웹에서는 디코딩이 메인 스레드에서 이루어지기 때문에 이것이 프레임 드롭의 주요 원인 중 하나예요. React Native에서는 이미지 디코딩이 다른 스레드에서 이루어져요. 실제로는 이미지가 아직 다운로드되지 않은 경우도 처리해야 하므로, 디코딩하는 동안 몇 프레임 더 플레이스홀더를 표시하는 것은 코드 변경이 필요하지 않아요.
+
+## iOS 이미지 캐시 제한 설정
+
+iOS에서는 React Native의 기본 이미지 캐시 제한을 재정의할 수 있는 API를 제공해요. 이는 네이티브 AppDelegate 코드 내에서 호출되어야 해요(예: <code>didFinishLaunchingWithOptions</code> 내에서).
+
+```objective-c
+RCTSetImageCacheLimits(4*1024*1024, 200*1024*1024);
+```
+
+매개변수:
+
+- <code>imageSizeLimit</code> (number, 필수): 이미지 캐시 크기 제한
+- <code>totalCostLimit</code> (number, 필수): 전체 캐시 비용 제한
+
+위 코드 예시에서 이미지 크기 제한은 4 MB로, 전체 비용 제한은 200 MB로 설정돼요.
