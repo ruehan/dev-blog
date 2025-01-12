@@ -1,0 +1,72 @@
+---
+title: "React Native Interaction"
+date: "2025-01-12"
+excerpt: "React Native Interaction"
+tags: ["React Native"]
+category: "개발"
+---
+
+# 터치 다루기
+
+사용자는 주로 터치를 통해 모바일 앱과 상호작용해요. 버튼을 탭하거나, 리스트를 스크롤하거나, 지도를 확대하는 등 다양한 제스처를 사용할 수 있죠. React Native는 모든 종류의 일반적인 제스처를 처리하기 위한 컴포넌트를 제공하고, 더 고급 제스처 인식을 위한 포괄적인 제스처 응답 시스템도 제공해요. 하지만 가장 많이 사용하게 될 컴포넌트는 기본적인 Button이에요.
+
+## 기본 버튼 표시하기
+
+Button은 모든 플랫폼에서 깔끔하게 렌더링되는 기본 버튼 컴포넌트를 제공해요. 버튼을 표시하는 가장 간단한 예시는 다음과 같아요:
+
+```tsx
+<Button
+	onPress={() => {
+		console.log("You tapped the button!");
+	}}
+	title="Press Me"
+/>
+```
+
+이렇게 하면 iOS에서는 파란색 레이블로, Android에서는 밝은 텍스트가 있는 파란색 둥근 사각형으로 렌더링돼요. 버튼을 누르면 "onPress" 함수가 호출되는데, 이 예시에서는 알림 팝업을 표시해요. 원한다면 "color" prop을 사용해서 버튼의 색상을 변경할 수 있어요.
+
+Button 컴포넌트를 아래 예시를 통해 직접 사용해보세요. 하단 오른쪽의 토글을 클릭해서 앱을 미리 볼 플랫폼을 선택하고, "Tap to Play"를 클릭해서 앱을 미리 볼 수 있어요.
+
+<iframe
+	src="https://snack.expo.dev/embedded/M9S8wILygpNopTffedD6P"
+	style={{
+		width: "100%",
+		height: "500px",
+		border: "1px solid #ddd",
+		borderRadius: "4px",
+		overflow: "hidden",
+	}}
+/>
+
+# 터치 가능한 컴포넌트들
+
+기본 버튼이 앱에 적합하지 않다면, React Native가 제공하는 "Touchable" 컴포넌트들을 사용해서 자신만의 버튼을 만들 수 있어요. "Touchable" 컴포넌트들은 탭 제스처를 감지하고, 제스처가 인식되었을 때 피드백을 표시할 수 있어요. 하지만 이 컴포넌트들은 기본 스타일을 제공하지 않으므로, 앱에서 보기 좋게 만들기 위해서는 약간의 작업이 필요해요.
+
+어떤 "Touchable" 컴포넌트를 사용할지는 제공하고 싶은 피드백의 종류에 따라 달라져요:
+
+- 일반적으로 <code>TouchableHighlight</code>를 웹의 버튼이나 링크처럼 사용할 수 있어요. 사용자가 버튼을 누르면 뷰의 배경이 어두워져요.
+
+- Android에서는 <code>TouchableNativeFeedback</code>을 사용해서 사용자의 터치에 반응하는 잉크 표면 반응 물결을 표시할 수 있어요.
+
+- <code>TouchableOpacity</code>는 사용자가 누르고 있는 동안 버튼의 투명도를 낮춰서 배경이 비치도록 함으로써 피드백을 제공할 수 있어요.
+
+- 탭 제스처는 처리하고 싶지만 피드백을 표시하고 싶지 않다면, <code>TouchableWithoutFeedback</code>을 사용하세요.
+
+경우에 따라서는 사용자가 뷰를 일정 시간 동안 누르고 있을 때를 감지하고 싶을 수 있어요. 이런 길게 누르기는 "Touchable" 컴포넌트들의 <code>onLongPress</code> props에 함수를 전달해서 처리할 수 있어요.
+
+실제로 어떻게 동작하는지 살펴볼까요:
+
+<iframe
+	src="https://snack.expo.dev/embedded/M9S8wILygpNopTffedD6P"
+	style={{
+		width: "100%",
+		height: "500px",
+		border: "1px solid #ddd",
+		borderRadius: "4px",
+		overflow: "hidden",
+	}}
+/>
+
+# 스크롤과 스와이프
+
+터치 스크린 기기에서 자주 사용되는 제스처에는 스와이프와 패닝이 있어요. 이를 통해 사용자는 항목 목록을 스크롤하거나 콘텐츠 페이지를 스와이프할 수 있어요. 이러한 기능은 ScrollView Core 컴포넌트를 확인해보세요.
