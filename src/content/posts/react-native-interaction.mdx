@@ -45,11 +45,8 @@ Button 컴포넌트를 아래 예시를 통해 직접 사용해보세요. 하단
 어떤 "Touchable" 컴포넌트를 사용할지는 제공하고 싶은 피드백의 종류에 따라 달라져요:
 
 - 일반적으로 <code>TouchableHighlight</code>를 웹의 버튼이나 링크처럼 사용할 수 있어요. 사용자가 버튼을 누르면 뷰의 배경이 어두워져요.
-
 - Android에서는 <code>TouchableNativeFeedback</code>을 사용해서 사용자의 터치에 반응하는 잉크 표면 반응 물결을 표시할 수 있어요.
-
 - <code>TouchableOpacity</code>는 사용자가 누르고 있는 동안 버튼의 투명도를 낮춰서 배경이 비치도록 함으로써 피드백을 제공할 수 있어요.
-
 - 탭 제스처는 처리하고 싶지만 피드백을 표시하고 싶지 않다면, <code>TouchableWithoutFeedback</code>을 사용하세요.
 
 경우에 따라서는 사용자가 뷰를 일정 시간 동안 누르고 있을 때를 감지하고 싶을 수 있어요. 이런 길게 누르기는 "Touchable" 컴포넌트들의 <code>onLongPress</code> props에 함수를 전달해서 처리할 수 있어요.
@@ -70,3 +67,241 @@ Button 컴포넌트를 아래 예시를 통해 직접 사용해보세요. 하단
 # 스크롤과 스와이프
 
 터치 스크린 기기에서 자주 사용되는 제스처에는 스와이프와 패닝이 있어요. 이를 통해 사용자는 항목 목록을 스크롤하거나 콘텐츠 페이지를 스와이프할 수 있어요. 이러한 기능은 ScrollView Core 컴포넌트를 확인해보세요.
+
+# 화면 간 이동하기
+
+모바일 앱은 단일 화면으로만 구성되는 경우가 거의 없어요. 여러 화면의 표시와 화면 간 전환은 일반적으로 네비게이터라고 알려진 것으로 처리돼요.
+
+이 가이드는 React Native에서 사용할 수 있는 다양한 네비게이션 컴포넌트들을 다뤄요. 네비게이션을 처음 시작한다면, React Navigation을 사용하는 것이 좋을 거예요. React Navigation은 Android와 iOS 모두에서 일반적인 스택 네비게이션과 탭 네비게이션 패턴을 구현할 수 있는 간단한 네비게이션 솔루션을 제공해요.
+
+이미 네이티브하게 네비게이션을 관리하는 앱에 React Native를 통합하거나, React Navigation의 대안을 찾고 있다면, 다음 라이브러리가 양쪽 플랫폼에서 네이티브 네비게이션을 제공해요: react-native-navigation.
+
+## React Navigation
+
+네비게이션을 위한 커뮤니티 솔루션은 몇 줄의 코드로 앱의 화면을 설정할 수 있게 해주는 독립형 라이브러리예요.
+
+### 설치 및 설정
+
+먼저, 프로젝트에 다음을 설치해야 해요:
+
+```shell
+npm install @react-navigation/native @react-navigation/native-stack
+```
+
+다음으로, 필요한 피어 디펜던시들을 설치해요. 프로젝트가 Expo 관리 프로젝트인지 순수 React Native 프로젝트인지에 따라 다른 명령어를 실행해야 해요.
+
+- Expo 관리 프로젝트라면, expo로 디펜던시를 설치하세요:
+
+```shell
+npx expo install react-native-screens react-native-safe-area-context
+```
+
+- 순수 React Native 프로젝트라면, npm으로 디펜던시를 설치하세요:
+
+```shell
+npm install react-native-screens react-native-safe-area-context
+```
+
+iOS에서 순수 React Native 프로젝트를 사용하는 경우, CocoaPods가 설치되어 있는지 확인하세요. 그런 다음 pods를 설치해서 설치를 완료하세요:
+
+```shell
+cd ios
+pod install
+cd ..
+```
+
+> 설치 후 피어 디펜던시와 관련된 경고가 발생할 수 있어요. 이는 일반적으로 일부 패키지에 지정된 버전 범위가 잘못되어 발생해요. 앱이 빌드되는 한 대부분의 경고는 안전하게 무시할 수 있어요.
+
+이제 <code>NavigationContainer</code>로 전체 앱을 감싸야 해요. 일반적으로 이는 <code>index.js</code>나 <code>App.js</code>와 같은 진입점 파일에서 수행해요:
+
+```tsx
+import * as React from "react";
+import { NavigationContainer } from "@react-navigation/native";
+
+const App = () => {
+	return <NavigationContainer>{/* Rest of your app code */}</NavigationContainer>;
+};
+
+export default App;
+```
+
+이제 디바이스/시뮬레이터에서 앱을 빌드하고 실행할 준비가 됐어요.
+
+### 사용법
+
+이제 홈 화면과 프로필 화면이 있는 앱을 만들 수 있어요:
+
+```tsx
+import * as React from "react";
+import { NavigationContainer } from "@react-navigation/native";
+import { createNativeStackNavigator } from "@react-navigation/native-stack";
+
+const Stack = createNativeStackNavigator();
+
+const MyStack = () => {
+	return (
+		<NavigationContainer>
+			<Stack.Navigator>
+				<Stack.Screen name="Home" component={HomeScreen} options={{ title: "Welcome" }} />
+				<Stack.Screen name="Profile" component={ProfileScreen} />
+			</Stack.Navigator>
+		</NavigationContainer>
+	);
+};
+```
+
+이 예시에서는 <code>Stack.Screen</code> 컴포넌트를 사용해서 2개의 화면(<code>Home</code>과 <code>Profile</code>)이 정의되어 있어요. 비슷한 방식으로 원하는 만큼 화면을 정의할 수 있어요.
+
+각 화면의 제목은 <code>Stack.Screen</code>의 <code>options</code> prop에서 설정할 수 있어요.
+
+각 화면은 React 컴포넌트인 <code>component</code> prop을 받아요. 이 컴포넌트들은 다른 화면으로 연결하는 다양한 메서드를 가진 <code>navigation</code> prop을 받아요. 예를 들어, <code>navigation.navigate</code>를 사용해서 <code>Profile</code> 화면으로 이동할 수 있어요:
+
+```tsx
+const HomeScreen = ({ navigation }) => {
+	return <Button title="Go to Jane's profile" onPress={() => navigation.navigate("Profile", { name: "Jane" })} />;
+};
+const ProfileScreen = ({ navigation, route }) => {
+	return <Text>This is {route.params.name}'s profile</Text>;
+};
+```
+
+이 native-stack 네비게이터는 iOS의 <code>UINavigationController</code>와 Android의 <code>Fragment</code>와 같은 네이티브 API를 사용해요. 따라서 <code>createNativeStackNavigator</code>로 만든 네비게이션은 이러한 API들을 기반으로 네이티브하게 만든 앱과 동일한 동작과 성능 특성을 가져요.
+
+React Navigation은 탭이나 드로어와 같은 다양한 종류의 네비게이터를 위한 패키지도 제공해요. 이러한 패키지들을 사용해서 앱에 다양한 패턴을 구현할 수 있어요.
+
+React Navigation에 대한 전체적인 소개는 React Navigation 시작하기 가이드를 참고하세요.
+
+# 애니메이션
+
+애니메이션은 훌륭한 사용자 경험을 만드는 데 매우 중요해요. 정지해 있는 객체가 움직이기 시작할 때는 관성을 극복해야 하고, 움직이는 객체는 모멘텀을 가지고 있어서 즉시 멈추는 경우가 거의 없죠. 애니메이션을 통해 인터페이스에서 물리적으로 믿을 수 있는 동작을 표현할 수 있어요.
+
+React Native는 두 가지 상호 보완적인 애니메이션 시스템을 제공해요: 특정 값의 세밀하고 상호작용적인 제어를 위한 <code>Animated</code>와 전역 레이아웃 트랜잭션을 위한 <code>LayoutAnimation</code>이에요.
+
+## Animated API
+
+<code>Animated</code> API는 다양한 흥미로운 애니메이션과 상호작용 패턴을 매우 성능 좋은 방식으로 간단하게 표현할 수 있도록 설계됐어요. <code>Animated</code>는 입력과 출력 사이의 선언적 관계에 중점을
+두고, 그 사이에 구성 가능한 변환과 시간 기반 애니메이션 실행을 제어하기 위한 <code>start</code>,<code>stop</code> 메서드를 제공해요.
+
+<code>Animated</code>는 여섯 가지 애니메이션 가능한 컴포넌트 타입을 제공해요: View, Text, Image, ScrollView, FlatList, SectionList 이에요. 하지만 <code>Animated.createAnimatedComponent()</code>를 사용해서
+자신만의 컴포넌트를 만들 수도 있어요.
+
+예를 들어, 마운트될 때 페이드 인되는 컨테이너 뷰는 다음과 같이 만들 수 있어요:
+
+<iframe
+	src="https://snack.expo.dev/embedded/D0Us2VsJWtaINohnJCQA1"
+	style={{
+		width: "100%",
+		height: "500px",
+		border: "1px solid #ddd",
+		borderRadius: "4px",
+		overflow: "hidden",
+	}}
+/>
+
+여기서 무슨 일이 일어나는지 살펴볼까요. <code>FadeInView</code> 생성자에서, <code>fadeAnim</code>이라는 새로운 <code>Animated.Value</code>가 state의 일부로 초기화돼요. <code>View</code>의 opacity 속성이 이 애니메이션 값에 매핑되고, 내부적으로는 숫자 값이 추출되어 opacity를 설정하는 데 사용돼요.
+
+컴포넌트가 마운트되면 opacity가 0으로 설정돼요. 그런 다음 <code>fadeAnim</code> 애니메이션 값에 대해 이징 애니메이션이 시작되는데, 이 값이 1로 애니메이션되는 동안 각 프레임마다 의존하는 모든 매핑(이 경우에는 opacity만)을 업데이트해요.
+
+이는 <code>setState</code>를 호출하고 다시 렌더링하는 것보다 더 최적화된 방식으로 수행돼요. 전체 구성이 선언적이기 때문에, 구성을 직렬화하고 고우선순위 스레드에서 애니메이션을 실행하는 추가 최적화를 구현할 수 있어요.
+
+### 애니메이션 구성하기
+
+애니메이션은 매우 다양하게 구성할 수 있어요. 커스텀 및 미리 정의된 이징 함수, 지연, 지속 시간, 감쇠 계수, 스프링 상수 등을 애니메이션 유형에 따라 모두 조정할 수 있어요.
+
+<code>Animated</code>는 여러 애니메이션 타입을 제공하는데, 가장 일반적으로 사용되는 것은 <code>Animated.timing()</code>이에요. 이는 다양한 미리 정의된 이징 함수를 사용하거나 직접 만든 이징 함수를 사용해서
+시간에 따라 값을 애니메이션할 수 있도록 지원해요. 이징 함수는 일반적으로 애니메이션에서 객체의 점진적인 가속과 감속을 표현하는 데 사용돼요.
+
+기본적으로 <code>timing</code>은 점진적인 가속으로 시작해서 최고 속도에 도달한 후 점진적으로 감속하며 멈추는 easeInOut 곡선을 사용해요. <code>easing</code> 매개변수를 전달해서 다른 이징 함수를 지정할 수 있어요. 커스텀 <code>duration</code>이나 애니메이션 시작 전 <code>delay</code>도 지원돼요.
+
+예를 들어, 최종 위치로 이동하기 전에 약간 뒤로 물러나는 2초짜리 애니메이션을 만들고 싶다면:
+
+```tsx
+Animated.timing(this.state.xPosition, {
+	toValue: 100,
+	easing: Easing.back(),
+	duration: 2000,
+	useNativeDriver: true,
+}).start();
+```
+
+내장 애니메이션이 지원하는 모든 구성 매개변수에 대해 자세히 알아보려면 <code>Animated</code> API 레퍼런스의 애니메이션 구성 섹션을 참고하세요.
+
+### 애니메이션 조합하기
+
+애니메이션은 순차적으로 또는 병렬로 조합하고 실행할 수 있어요. 순차 애니메이션은 이전 애니메이션이 끝난 직후 또는 지정된 지연 시간 후에 시작할 수 있어요. <code>Animated</code> API는 <code>sequence()</code>와 <code>delay()</code> 같은 여러 메서드를 제공하는데, 각각은 실행할 애니메이션 배열을 받고 필요에 따라 자동으로 <code>start()</code>/<code>stop()</code>을 호출해요.
+
+예를 들어, 다음 애니메이션은 멈출 때까지 감속한 다음, 회전하면서 동시에 다시 튀어오르죠:
+
+```tsx
+Animated.sequence([
+	// decay, then spring to start and twirl
+	Animated.decay(position, {
+		// coast to a stop
+		velocity: { x: gestureState.vx, y: gestureState.vy }, // velocity from gesture release
+		deceleration: 0.997,
+		useNativeDriver: true,
+	}),
+	Animated.parallel([
+		// after decay, in parallel:
+		Animated.spring(position, {
+			toValue: { x: 0, y: 0 }, // return to start
+			useNativeDriver: true,
+		}),
+		Animated.timing(twirl, {
+			// and twirl
+			toValue: 360,
+			useNativeDriver: true,
+		}),
+	]),
+]).start(); // start the sequence group
+```
+
+하나의 애니메이션이 중지되거나 중단되면 그룹의 다른 모든 애니메이션도 중지돼요. <code>Animated.parallel</code>의 <code>stopTogether</code> 옵션을 <code>false</code>로 설정하면 이 기능을 비활성화할 수 있어요.
+
+조합 메서드의 전체 목록은 <code>Animated</code> API 레퍼런스의 애니메이션 조합 섹션에서 확인할 수 있어요.
+
+### 애니메이션 값 조합하기
+
+두 개의 애니메이션 값을 덧셈, 곱셈, 나눗셈 또는 모듈로 연산을 통해 조합해서 새로운 애니메이션 값을 만들 수 있어요.
+
+계산을 위해 애니메이션 값을 반전시켜야 하는 경우가 있어요. 예를 들어 스케일을 반전시키는 경우(2x --> 0.5x)를 살펴볼까요:
+
+```tsx
+const a = new Animated.Value(1);
+const b = Animated.divide(1, a);
+
+Animated.spring(a, {
+	toValue: 2,
+	useNativeDriver: true,
+}).start();
+```
+
+### 보간
+
+각 속성은 먼저 보간을 거칠 수 있어요. 보간은 입력 범위를 출력 범위로 매핑하는데, 일반적으로 선형 보간을 사용하지만 이징 함수도 지원해요. 기본적으로는 주어진 범위를 넘어서도 곡선을 확장하지만, 출력 값을 고정할 수도 있어요.
+
+0-1 범위를 0-100 범위로 변환하는 기본적인 매핑은 다음과 같아요:
+
+```tsx
+value.interpolate({
+	inputRange: [0, 1],
+	outputRange: [0, 100],
+});
+```
+
+예를 들어, <code>Animated.Value</code>가 0에서 1로 변하지만 위치는 150px에서 0px로, 투명도는 0에서 1로 애니메이션하고 싶을 수 있어요. 이는 위 예시의 <code>style</code>을 다음과 같이 수정해서 구현할 수 있어요:
+
+```tsx
+  style={{
+    opacity: this.state.fadeAnim, // Binds directly
+    transform: [{
+      translateY: this.state.fadeAnim.interpolate({
+        inputRange: [0, 1],
+        outputRange: [150, 0]  // 0 : 150, 0.5 : 75, 1 : 0
+      }),
+    }],
+  }}
+```
+
+<code>interpolate()</code>는 여러 범위 세그먼트도 지원하는데, 이는 데드존과 다른 유용한 트릭을 정의하는 데 편리해요. 예를 들어, -300에서 -100까지는 0으로 가는 음의 관계를 가지고, 0에서는 1로
+올라갔다가 100에서 0으로 다시 내려가고, 그 이후로는 0에 머무는 데드존을 만들 수 있어요.
