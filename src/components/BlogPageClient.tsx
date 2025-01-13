@@ -32,11 +32,12 @@ export default function BlogPageClient({ initialPosts, categories, tags }: BlogP
 
 	return (
 		<div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-			<SearchBar posts={initialPosts} onSearch={setSearchResults} />
+			<div className="sticky top-20 z-10 py-4">
+				<SearchBar posts={initialPosts} onSearch={setSearchResults} />
+			</div>
 
 			<div className="grid grid-cols-1 md:grid-cols-4 gap-6">
-				{/* Sidebar */}
-				<aside className="space-y-6 md:col-span-1">
+				<aside className="md:sticky md:top-36 h-fit space-y-6 md:col-span-1">
 					{/* Categories */}
 					<div>
 						<h2 className="text-xl font-bold mb-3 text-gray-900 dark:text-white">카테고리</h2>
