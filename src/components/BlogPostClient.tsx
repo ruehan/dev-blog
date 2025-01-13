@@ -12,7 +12,8 @@ import ScrollProgress from "@/components/ScrollProgress";
 import ReadingTime from "@/components/ReadingTime";
 import FontSizeControl from "@/components/FontSizeControl";
 import PostViews from "./PostViews";
-import {motion} from "framer-motion"
+import { motion } from "framer-motion";
+import { useEffect } from "react";
 
 interface BlogPostClientProps {
 	post: Post;
@@ -20,6 +21,19 @@ interface BlogPostClientProps {
 }
 
 export default function BlogPostClient({ post, allPosts }: BlogPostClientProps) {
+	useEffect(() => {
+		const handleBeforeUnload = (e: BeforeUnloadEvent) => {
+			e.preventDefault();
+			e.returnValue = "새로고침 불가";
+		};
+
+		window.addEventListener("beforeunload", handleBeforeUnload);
+
+		return () => {
+			window.removeEventListener("beforeunload", handleBeforeUnload);
+		};
+	}, []);
+
 	const handleShare = async () => {
 		if (navigator.share) {
 			try {
@@ -40,27 +54,17 @@ export default function BlogPostClient({ post, allPosts }: BlogPostClientProps) 
 	return (
 		<>
 			<ScrollProgress />
-			<motion.div 
-				initial={{ opacity: 0, y: 20 }}
-				animate={{ opacity: 1, y: 0 }}
-				transition={{ duration: 0.5 }}
-				className="grid grid-cols-1 lg:grid-cols-4 gap-8"
-			>
+			<motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5 }} className="grid grid-cols-1 lg:grid-cols-4 gap-8">
 				{/* Main Content */}
 				<article className="lg:col-span-3">
-					<motion.header 
-						initial={{ opacity: 0 }}
-						animate={{ opacity: 1 }}
-						transition={{ delay: 0.2 }}
-						className="mb-8"
-					>
+					<motion.header initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.2 }} className="mb-8">
 						<div className="flex justify-between items-start mb-4">
 							<h1 className="text-4xl font-bold text-gray-900 dark:text-white">{post.title}</h1>
-							<motion.button 
-								onClick={handleShare} 
+							<motion.button
+								onClick={handleShare}
 								whileHover={{ scale: 1.1 }}
 								whileTap={{ scale: 0.95 }}
-								className="p-2 text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200" 
+								className="p-2 text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200"
 								aria-label="Share post"
 							>
 								<Share2 className="h-5 w-5" />
@@ -77,12 +81,7 @@ export default function BlogPostClient({ post, allPosts }: BlogPostClientProps) 
 						</div>
 					</motion.header>
 
-					<motion.div 
-						initial={{ opacity: 0 }}
-						animate={{ opacity: 1 }}
-						transition={{ delay: 0.3 }}
-						className="flex flex-wrap gap-2 mb-8"
-					>
+					<motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.3 }} className="flex flex-wrap gap-2 mb-8">
 						{post.tags.map((tag, index) => (
 							<motion.span
 								key={tag}
@@ -97,12 +96,7 @@ export default function BlogPostClient({ post, allPosts }: BlogPostClientProps) 
 						))}
 					</motion.div>
 
-					<motion.div 
-						initial={{ opacity: 0, y: 20 }}
-						animate={{ opacity: 1, y: 0 }}
-						transition={{ delay: 0.4 }}
-						className="prose dark:prose-invert prose-lg max-w-none"
-					>
+					<motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.4 }} className="prose dark:prose-invert prose-lg max-w-none">
 						<MDXRemote source={post.content} components={components} />
 					</motion.div>
 
@@ -112,12 +106,7 @@ export default function BlogPostClient({ post, allPosts }: BlogPostClientProps) 
 				</article>
 
 				{/* Sidebar */}
-				<motion.aside 
-					initial={{ opacity: 0, x: 20 }}
-					animate={{ opacity: 1, x: 0 }}
-					transition={{ delay: 0.5 }}
-					className="lg:col-span-1"
-				>
+				<motion.aside initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 0.5 }} className="lg:col-span-1">
 					<TableOfContents />
 				</motion.aside>
 			</motion.div>
