@@ -6,6 +6,7 @@ import { PostMeta } from "@/types/post";
 import SearchBar from "@/components/SearchBar";
 import SearchResults from "@/components/SearchResults";
 import { CATEGORY_MAP, getCategoryInEnglish, getTagInEnglish } from "@/mapping";
+import AllPageViews from "./AllPageViews";
 
 type SortOrder = "newest" | "oldest";
 
@@ -71,6 +72,7 @@ export default function BlogPageClient({ initialPosts, categories, tags }: BlogP
 							})}
 						</div>
 					</div>
+					<AllPageViews />
 				</aside>
 
 				{/* Main Content */}
