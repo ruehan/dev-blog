@@ -524,3 +524,67 @@ Direct Manipulation 섹션에서 언급했듯이, <code>setNativeProps</code>를
 Rebound 예시에서 이를 사용해서 스케일을 업데이트할 수 있어요 - 이는 업데이트하려는 컴포넌트가 깊이 중첩되어 있고 <code>shouldComponentUpdate</code>로 최적화되지 않은 경우에 유용할 수 있어요.
 
 애니메이션이 프레임을 놓치는 경우(초당 60프레임 이하로 실행되는 경우), <code>setNativeProps</code> 또는 <code>shouldComponentUpdate</code>를 사용해서 최적화하는 것을 고려해보세요. 또는 <code>useNativeDriver</code> 옵션을 사용해서 JavaScript 스레드 대신 UI 스레드에서 애니메이션을 실행할 수 있어요. InteractionManager를 사용해서 애니메이션이 완료된 후로 계산 집약적인 작업을 연기하는 것도 좋은 방법이에요. In-App Dev Menu의 "FPS Monitor" 도구를 사용해서 프레임 속도를 모니터링할 수 있어요.
+
+# 제스처 응답 시스템
+
+제스처 응답 시스템은 앱에서 제스처의 생명주기를 관리해요. 터치는 앱이 사용자의 의도를 파악하는 동안 여러 단계를 거칠 수 있어요. 예를 들어, 앱은 터치가 스크롤인지, 위젯 위에서 슬라이딩하는 것인지, 또는 탭핑인지를 판단해야 해요. 이는 터치가 진행되는 동안에도 변경될 수 있으며, 여러 터치가 동시에 발생할 수도 있어요.
+
+터치 응답 시스템은 컴포넌트가 부모나 자식 컴포넌트에 대한 추가 지식 없이도 이러한 터치 상호작용을 협상할 수 있도록 해줘요.
+
+## 모범 사례
+
+앱을 훌륭하게 만들기 위해서는 모든 동작이 다음과 같은 특성을 가져야 해요:
+
+* 피드백/하이라이팅 - 사용자의 터치를 처리하고 있다는 것과, 제스처를 놓았을 때 어떤 일이 일어날지 사용자에게 보여주세요
+* 취소 가능성 - 동작을 수행할 때, 사용자가 손가락을 멀리 드래그해서 중간에 중단할 수 있어야 해요
+
+이러한 기능들은 사용자가 실수에 대한 두려움 없이 실험하고 상호작용할 수 있게 해주므로, 앱을 사용할 때 더 편안함을 느끼게 해줘요.
+
+## TouchableHighlight와 Touchable*
+
+응답 시스템은 사용하기 복잡할 수 있어요. 그래서 우리는 "탭 가능한" 것들을 위한 추상화된 <code>Touchable</code> 구현을 제공해요. 이는 응답 시스템을 사용하며 선언적으로 탭 상호작용을 구성할 수 있게 해줘요. 웹에서 버튼이나 링크를 사용할 곳이라면 어디든 <code>TouchableHighlight</code>를 사용하세요.
+
+## 응답자 생명주기
+
+뷰는 올바른 협상 메서드를 구현함으로써 터치 응답자가 될 수 있어요. 뷰가 응답자가 되고 싶은지 물어보는 두 가지 메서드가 있어요:
+
+* <code>View.props.onStartShouldSetResponder: evt => true</code> - 터치 시작 시 이 뷰가 응답자가 되길 원하나요?
+* <code>View.props.onMoveShouldSetResponder: evt => true</code> - 뷰가 응답자가 아닐 때 터치 이동이 발생할 때마다 호출됨: 이 뷰가 터치 응답성을 "가져가고" 싶나요?
+
+View가 true를 반환하고 응답자가 되려고 시도하면, 다음 중 하나가 발생해요:
+
+* <code>View.props.onResponderGrant: evt => {}</code> - 이제 View가 터치 이벤트에 응답하고 있어요. 이때 하이라이트를 표시하고 사용자에게 무슨 일이 일어나고 있는지 보여주세요
+* <code>View.props.onResponderReject: evt => {}</code> - 현재 다른 무언가가 응답자이며 이를 놓아주지 않을 거예요
+
+뷰가 응답 중이라면, 다음 핸들러들이 호출될 수 있어요:
+
+* <code>View.props.onResponderMove: evt => {}</code> - 사용자가 손가락을 움직이고 있어요
+* <code>View.props.onResponderRelease: evt => {}</code> - 터치 끝에서 발생, 즉 "touchUp"
+* <code>View.props.onResponderTerminationRequest: evt => true</code> - 다른 무언가가 응답자가 되길 원해요. 이 뷰가 응답자를 놓아줘야 할까요? true를 반환하면 놓아줄 수 있어요
+* <code>View.props.onResponderTerminate: evt => {}</code> - View에서 응답자가 제거됐어요. onResponderTerminationRequest 호출 후 다른 뷰가 가져갔거나, OS가 요청 없이 가져갔을 수 있어요(iOS의 제어 센터/알림 센터에서 발생)
+
+<code>evt</code>는 다음과 같은 형식을 가진 합성 터치 이벤트예요:
+
+* nativeEvent
+  * changedTouches - 마지막 이벤트 이후 변경된 모든 터치 이벤트의 배열
+  * identifier - 터치의 ID
+  * locationX - 요소를 기준으로 한 터치의 X 위치
+  * locationY - 요소를 기준으로 한 터치의 Y 위치
+  * pageX - 루트 요소를 기준으로 한 터치의 X 위치
+  * pageY - 루트 요소를 기준으로 한 터치의 Y 위치
+  * target - 터치 이벤트를 받는 요소의 노드 ID
+  * timestamp - 속도 계산에 유용한 터치의 시간 식별자
+  * touches - 화면의 모든 현재 터치의 배열
+
+## Capture ShouldSet 핸들러
+
+<code>onStartShouldSetResponder</code>와 <code>onMoveShouldSetResponder</code>는 버블링 패턴으로 호출돼요. 가장 깊은 노드가 먼저 호출되죠. 이는 여러 View가 *ShouldSetResponder 핸들러에 대해 true를 반환할 때 가장 깊은 컴포넌트가 응답자가 된다는 의미예요. 이는 대부분의 경우 바람직한데, 모든 컨트롤과 버튼이 사용 가능하도록 보장하기 때문이에요.
+
+하지만 때로는 부모가 응답자가 되도록 보장하고 싶을 수 있어요. 이는 캡처 단계를 사용해서 처리할 수 있어요. 응답자 시스템이 가장 깊은 컴포넌트에서 위로 버블링하기 전에, 캡처 단계를 수행하면서 on*ShouldSetResponderCapture를 실행해요. 따라서 부모 View가 터치 시작 시 자식이 응답자가 되는 것을 방지하려면 <code>onStartShouldSetResponderCapture</code> 핸들러가 true를 반환하도록 해야 해요.
+
+* <code>View.props.onStartShouldSetResponderCapture: evt => true,</code>
+* <code>View.props.onMoveShouldSetResponderCapture: evt => true,</code>
+
+## PanResponder
+
+더 높은 수준의 제스처 해석을 위해서는 PanResponder를 확인해보세요.
