@@ -2,23 +2,33 @@ import { type MDXComponents } from 'mdx/types';
 import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
 import { dracula } from 'react-syntax-highlighter/dist/cjs/styles/prism';
 import CopyButton from "@/components/CopyButton";
+import { extractTextFromNode, generateIdFromNode } from '@/utils/text';
 
 const components: MDXComponents = {
-    h1: ({ children }) => (
-        <h1 className="text-3xl font-bold mt-8 mb-4 text-gray-900 dark:text-white">
-            {children}
-        </h1>
-    ),
-    h2: ({ children }) => (
-        <h2 className="text-2xl font-bold mt-6 mb-4 text-gray-900 dark:text-white">
-            {children}
-        </h2>
-    ),
-    h3: ({ children }) => (
-        <h3 className="text-xl font-bold mt-4 mb-3 text-gray-900 dark:text-white">
-            {children}
-        </h3>
-    ),
+    h1: ({ children }) => {
+        const id = generateIdFromNode(children);
+        return (
+            <h1 id={id} className="text-3xl font-bold mt-8 mb-4 text-gray-900 dark:text-white">
+                {children}
+            </h1>
+        );
+    },
+    h2: ({ children }) => {
+        const id = generateIdFromNode(children);
+        return (
+            <h2 id={id} className="text-2xl font-bold mt-6 mb-4 text-gray-900 dark:text-white">
+                {children}
+            </h2>
+        );
+    },
+    h3: ({ children }) => {
+        const id = generateIdFromNode(children);
+        return (
+            <h3 id={id} className="text-xl font-bold mt-4 mb-3 text-gray-900 dark:text-white">
+                {children}
+            </h3>
+        );
+    },
     p: ({ children }) => (
         <p className="mb-4 text-gray-700 dark:text-gray-300 leading-relaxed">
             {children}
