@@ -57,10 +57,7 @@ const RootLayout = ({ children }: { children: React.ReactNode }) => {
 					<div className="flex justify-between h-16">
 						<div className="flex items-center">
 							<Link href="/" className="flex items-center group">
-								<motion.span
-									className="text-xl font-bold bg-gradient-to-r from-primary-600 to-accent-medium bg-clip-text text-transparent group-hover:shadow-glow transition-all duration-300"
-									whileHover={{ scale: 1.05 }}
-								>
+								<motion.span className="text-xl font-bold bg-gradient-to-r from-primary-600 to-accent-medium bg-clip-text text-transparent transition-all duration-300" whileHover={{ scale: 1.05 }}>
 									Ruehan
 								</motion.span>
 							</Link>
