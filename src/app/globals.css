@@ -7,7 +7,7 @@
 }
 
 body {
-	@apply bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100;
+	@apply bg-gradient-to-br from-background-start to-background-end dark:from-dark-background-start dark:to-dark-background-end text-gray-900 dark:text-gray-100 transition-colors duration-300;
 }
 
 /* pre {
@@ -29,25 +29,65 @@ code::after {
 
 @layer base {
 	:root {
-		--background: #ffffff;
-		--foreground: #000000;
+		--background-start: #ffffff;
+		--background-end: #f8fafc;
+		--foreground: #0f172a;
 
-		/* 틸(Teal) 테마 */
-		--primary-50: #f0fdfa;
-		--primary-100: #ccfbf1;
-		--primary-200: #99f6e4;
-		--primary-300: #5eead4;
-		--primary-400: #2dd4bf;
-		--primary-500: #14b8a6;
-		--primary-600: #0d9488;
-		--primary-700: #0f766e;
-		--primary-800: #115e59;
-		--primary-900: #134e4a;
-		--primary-950: #042f2e;
+		/* 현대적인 퍼플-블루 그라데이션 테마 */
+		--primary-50: #f5f3ff;
+		--primary-100: #ede9fe;
+		--primary-200: #ddd6fe;
+		--primary-300: #c4b5fd;
+		--primary-400: #a78bfa;
+		--primary-500: #8b5cf6;
+		--primary-600: #7c3aed;
+		--primary-700: #6d28d9;
+		--primary-800: #5b21b6;
+		--primary-900: #4c1d95;
+		--primary-950: #2e1065;
+
+		/* 액센트 색상 */
+		--accent-light: #22d3ee;
+		--accent-medium: #06b6d4;
+		--accent-dark: #0891b2;
 	}
 
 	.dark {
-		--background: #0f172a;
-		--foreground: #ffffff;
+		--background-start: #0f172a;
+		--background-end: #1e293b;
+		--foreground: #f8fafc;
+
+		--dark-background-start: #0f172a;
+		--dark-background-end: #1e293b;
 	}
+}
+
+/* 글로벌 애니메이션 */
+@keyframes float {
+	0% {
+		transform: translateY(0px);
+	}
+	50% {
+		transform: translateY(-10px);
+	}
+	100% {
+		transform: translateY(0px);
+	}
+}
+
+.animate-float {
+	animation: float 3s ease-in-out infinite;
+}
+
+/* 글래스모피즘 효과 */
+.glass {
+	background: rgba(255, 255, 255, 0.25);
+	backdrop-filter: blur(10px);
+	-webkit-backdrop-filter: blur(10px);
+	border: 1px solid rgba(255, 255, 255, 0.18);
+}
+
+.dark .glass {
+	background: rgba(15, 23, 42, 0.25);
+	border: 1px solid rgba(255, 255, 255, 0.08);
 }
