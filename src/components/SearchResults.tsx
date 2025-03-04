@@ -48,7 +48,7 @@ export default function SearchResults({ results }: SearchResultsProps) {
 	};
 
 	return (
-		<motion.div variants={container} initial="hidden" animate="show" className="space-y-8">
+		<motion.div variants={container} initial="hidden" animate="show" className="space-y-8 max-w-3xl mx-auto">
 			{results.map((post) => (
 				<motion.article
 					key={post.slug}

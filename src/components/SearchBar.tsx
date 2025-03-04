@@ -73,7 +73,7 @@ export default function SearchBar({ posts, onSearch }: SearchBarProps) {
 	}, [debouncedSearch]);
 
 	return (
-		<motion.div initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5 }} className="relative w-full max-w-2xl mx-auto mb-8">
+		<motion.div initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5 }} className="relative w-full max-w-3xl mx-auto mb-8">
 			<div
 				className={`relative transition-all duration-300 ${isFocused ? "shadow-glow" : isHovered ? "shadow-md" : "shadow-sm"}`}
 				onMouseEnter={() => setIsHovered(true)}

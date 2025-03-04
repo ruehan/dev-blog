@@ -69,20 +69,20 @@ export default function BlogPageClient({ initialPosts, categories, tags }: BlogP
 	}
 
 	return (
-		<motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.5 }} className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+		<motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.5 }} className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 xl:px-0">
 			<div className="sticky top-20 z-10 py-4">
 				<SearchBar posts={initialPosts} onSearch={setSearchResults} />
 			</div>
 
-			<div className="grid grid-cols-1 md:grid-cols-4 gap-6">
+			<div className="grid grid-cols-1 lg:grid-cols-8 gap-6">
 				<motion.aside
 					initial={{ opacity: 0, x: -20 }}
 					animate={{ opacity: 1, x: 0 }}
 					transition={{ duration: 0.5, delay: 0.2 }}
-					className="md:sticky md:top-36 h-fit space-y-6 md:col-span-1 glass p-6 rounded-xl"
+					className="lg:col-span-2 md:sticky md:top-36 h-fit space-y-8 glass p-7 rounded-xl"
 				>
 					{/* 모바일 필터 토글 */}
-					<div className="md:hidden">
+					<div className="lg:hidden">
 						<button
 							onClick={() => setShowFilters(!showFilters)}
 							className="flex items-center justify-between w-full p-3 bg-primary-100 dark:bg-gray-800 rounded-lg text-primary-700 dark:text-primary-300"
@@ -95,31 +95,42 @@ export default function BlogPageClient({ initialPosts, categories, tags }: BlogP
 					</div>
 
 					<AnimatePresence>
-						{(showFilters || window.innerWidth >= 768) && (
+						{(showFilters || window.innerWidth >= 1024) && (
 							<motion.div
 								initial={{ height: 0, opacity: 0 }}
 								animate={{ height: "auto", opacity: 1 }}
 								exit={{ height: 0, opacity: 0 }}
 								transition={{ duration: 0.3 }}
-								className="space-y-6 overflow-hidden md:h-auto"
+								className="space-y-6 overflow-hidden lg:h-auto"
 							>
 								{/* Categories */}
 								<div>
 									<h2 className="text-xl font-bold mb-3 bg-gradient-to-r from-primary-600 to-accent-medium bg-clip-text text-transparent">카테고리</h2>
-									<ul className="space-y-2">
+									<ul className="space-y-3">
 										{categories.map((category) => {
 											const categorySlug = getCategoryInEnglish(category);
 											const isSelected = selectedCategory === category;
 											return (
-												<motion.li key={categorySlug} whileHover={{ x: 5 }} transition={{ type: "spring", stiffness: 300 }}>
+												<motion.li
+													key={categorySlug}
+													whileHover={{ x: 5 }}
+													transition={{ type: "spring", stiffness: 300 }}
+													className="border-b border-gray-100 dark:border-gray-800 pb-2 last:border-0"
+												>
 													<button
 														onClick={() => setSelectedCategory(isSelected ? null : category)}
-														className={`text-left w-full ${
+														className={`text-left w-full flex items-center justify-between ${
 															isSelected ? "text-primary-600 dark:text-primary-400 font-medium" : "text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white"
 														}`}
 													>
-														{category}
-														{isSelected && <span className="ml-2">✓</span>}
+														<span className="text-base">{category}</span>
+														{isSelected && (
+															<span className="text-primary-500 dark:text-primary-400">
+																<svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+																	<path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+																</svg>
+															</span>
+														)}
 													</button>
 												</motion.li>
 											);
@@ -130,7 +141,7 @@ export default function BlogPageClient({ initialPosts, categories, tags }: BlogP
 								{/* Tags */}
 								<div>
 									<h2 className="text-xl font-bold mb-3 bg-gradient-to-r from-primary-600 to-accent-medium bg-clip-text text-transparent">태그</h2>
-									<div className="flex flex-wrap gap-2">
+									<div className="flex flex-wrap gap-2.5">
 										{tags.map((tag) => {
 											const tagSlug = getTagInEnglish(tag);
 											const isSelected = selectedTags.includes(tag);
@@ -140,7 +151,7 @@ export default function BlogPageClient({ initialPosts, categories, tags }: BlogP
 													onClick={() => toggleTag(tag)}
 													whileHover={{ scale: 1.05 }}
 													whileTap={{ scale: 0.95 }}
-													className={`px-3 py-1 rounded-full text-sm transition-all duration-300 ${
+													className={`px-3.5 py-1.5 rounded-full text-sm transition-all duration-300 ${
 														isSelected ? "bg-primary-500 text-white dark:bg-primary-600" : "bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-300 dark:hover:bg-gray-600"
 													}`}
 												>
@@ -171,7 +182,7 @@ export default function BlogPageClient({ initialPosts, categories, tags }: BlogP
 				</motion.aside>
 
 				{/* Main Content */}
-				<motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5, delay: 0.4 }} className="md:col-span-3">
+				<motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5, delay: 0.4 }} className="lg:col-span-5 lg:col-start-3">
 					<div className="flex justify-between items-center mb-8">
 						<motion.h1
 							initial={{ opacity: 0, x: -20 }}
@@ -209,6 +220,9 @@ export default function BlogPageClient({ initialPosts, categories, tags }: BlogP
 					</div>
 					<SearchResults results={filteredAndSortedPosts} />
 				</motion.div>
+
+				{/* Right empty space for balance */}
+				<div className="hidden lg:block lg:col-span-1"></div>
 			</div>
 		</motion.div>
 	);
